@@ -6,7 +6,7 @@ Abstract HTTP Request is an HTTP Client with **very reasonable default settings*
 Currently the following are supported:
 
   * Browsers (jQuery / XHR backend) - jQuery dependency to be removed soon
-  * Node.js (native HTTPClient)
+  * Node.js (Http.Client, auto-redirects on 3xx responses)
 
 Installation
 ====
