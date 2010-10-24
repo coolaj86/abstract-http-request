@@ -62,9 +62,10 @@ Loosely modeled after [Node's Http.Client and URL API]("http://nodejs.org/api.ht
       },
       "body": undefined,
       "encodedBody": undefined,
+      "attachments": undefined // for multi-part forms; not implemented yet
 
       // Timeout after 20 seconds
-      "timeout": 20000
+      "timeout": 20000 // not implemented yet in node
     }
 
 When options.body exists the default `Content-Type` will be `x-www-form-urlencoded`;

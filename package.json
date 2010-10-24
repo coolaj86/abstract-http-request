@@ -1,0 +1,12 @@
+{
+  "name"          : "ahr",
+  "description"   : "An Abstract Http Request which works on SSJS as well as in the browser.",
+  "url"           : "http://github.com/coolaj86/ahr/",
+  "keywords"      : ["util", "ahr", "xmlhttprequest", "http", "server", "client", "browser"],
+  "author"        : "AJ ONeal <coolaj86@gmail.com>",
+  "contributors"  : [],
+  "dependencies"  : ["futures"],
+  "lib"           : "lib",
+  "main"          : "./lib/ahr",
+  "version"       : "0.6.0"
+}
