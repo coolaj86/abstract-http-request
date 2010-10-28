@@ -5,8 +5,8 @@
   "keywords"      : ["util", "ahr", "xmlhttprequest", "http", "server", "client", "browser"],
   "author"        : "AJ ONeal <coolaj86@gmail.com>",
   "contributors"  : [],
-  "dependencies"  : ["futures"],
+  "dependencies"  : ["futures", "base64"],
   "lib"           : "lib",
   "main"          : "./lib/ahr",
-  "version"       : "0.6.0"
+  "version"       : "0.7.0"
 }

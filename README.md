@@ -55,12 +55,12 @@ Loosely modeled after [Node's Http.Client and URL API]("http://nodejs.org/api.ht
 
       // Request Params
       "method": "GET",
-      "auth": undefined, // user:pass - TODO
+      "auth": undefined, // in the format "username:password"
       "headers": {
         "User-Agent": YOUR-BROWSER-UA | "node.js",
         "Accept": "*/*",
         "Content-Type": undefined,
-        "Content-Length": undefined,
+        "Content-Length": this.encodedBody.length,
         "Transfer-Encoding": undefined
       },
       "body": undefined,
@@ -68,11 +68,11 @@ Loosely modeled after [Node's Http.Client and URL API]("http://nodejs.org/api.ht
       "attachments": undefined, // for multi-part forms; TODO
 
       // Timeout after 20 seconds
-      "timeout": 20000, // TODO
+      "timeout": 20000,
 
       // get the xhr or http.request object immediately and do something with it 
       // before the response is received
-      "syncback": undefined
+      "syncback": function () {}
     }
 
 When options.body exists the default `Content-Type` will be `x-www-form-urlencoded`;
