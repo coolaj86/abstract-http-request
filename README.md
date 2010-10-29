@@ -1,12 +1,28 @@
 AbstractHttpRequest
 ====
 
-Abstract HTTP Request is an HTTP Client with **very reasonable default settings** that works both in **Browers** and **SSJS**.
+Abstract HTTP Request is a lightweight HTTP Client with **very reasonable default settings** that works both in **Browers** and **SSJS**.
+
+In provides a thin abstraction layer over the underlaying http client (XMLHttpRequest or Http.Client.Request.Response)
 
 Currently the following are supported:
 
   * Browsers (jQuery / XHR backend) - jQuery dependency to be removed soon
+    * JSONP by script tag injection
+    * XHR Level 1 requests
+    * Lightweight standalone Abstraction of XHR
+    * If jQuery is detected, uses jQuery instead
+
   * Node.js (Http.Client, auto-redirects on 3xx responses)
+    * JSONP via http Client
+    * Automatically redirects on 3xx requests (excluding 304)
+    * Automatically handles base64 encoding of HTTP Basic Authentication
+
+Goals
+----
+
+  * XHR2 / CORS support, (with option plugin for post form / iframe tricks)
+  * Echo server to test browser requests against
 
 Installation
 ====
@@ -57,8 +73,8 @@ Loosely modeled after [Node's Http.Client and URL API]("http://nodejs.org/api.ht
       "method": "GET",
       "auth": undefined, // in the format "username:password"
       "headers": {
-        "User-Agent": YOUR-BROWSER-UA | "node.js",
-        "Accept": "*/*",
+        "User-Agent": YOUR-BROWSER-UA | "Node.js (AbstractHttpRequest)",
+        "Accept": "application/json; charset=utf-8, */*; q=0.5", // prefer json utf-8, accept anything
         "Content-Type": undefined,
         "Content-Length": this.encodedBody.length,
         "Transfer-Encoding": undefined
@@ -72,7 +88,10 @@ Loosely modeled after [Node's Http.Client and URL API]("http://nodejs.org/api.ht
 
       // get the xhr or http.request object immediately and do something with it 
       // before the response is received
-      "syncback": function () {}
+      "syncback": function () {},
+
+      // if jQuery is present
+      "jQopts": {} // these options are passed to jQuery directly, overriding the defaults
     }
 
 When options.body exists the default `Content-Type` will be `x-www-form-urlencoded`;
