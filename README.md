@@ -80,7 +80,7 @@ When options.body exists the default `Content-Type` will be `x-www-form-urlencod
 
 Note: In the browser jQuery is currently used. This dependency will go away shortly, I just wanted it up quickly
 
-AHR.head|get|delete|options(url, params, options)
+AHR. | head | get | delete | options | (url, params, options)
 ----
 
     AHR.get("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000})
@@ -89,7 +89,7 @@ AHR.head|get|delete|options(url, params, options)
         console.log(data);
       });
 
-AHR.post|put(url, params, body, options)
+AHR | post | put | (url, params, body, options)
 ----
 
 When `options.body` exists the default `Content-Type` will be `x-www-form-urlencoded`;
