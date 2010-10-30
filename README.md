@@ -21,6 +21,7 @@ Currently the following are supported:
 Goals
 ----
 
+  * **Make consistent with [`request`](http://github.com/mikeal/node-utils/tree/master/request/)**
   * XHR2 / CORS support, (with option plugin for post form / iframe tricks)
   * Echo server to test browser requests against
 
