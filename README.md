@@ -14,7 +14,7 @@ Currently the following are supported:
     * If jQuery is detected, uses jQuery instead
 
   * Node.js (Http.Client, auto-redirects on 3xx responses)
-    * **API-compatibel with [`node-request`](http://github.com/mikeal/node-utils/tree/master/request/)**
+    * **API-compatible with [`node-request`](http://github.com/mikeal/node-utils/tree/master/request/)**
       * Passes `node-request` tests. Any break from `node-request`'s documented API should be filed as bug
     * JSONP via http Client
     * Automatically redirects on 3xx requests (excluding 304)
