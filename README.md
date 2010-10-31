@@ -94,7 +94,7 @@ Joining Requests
 
     // request.join(req1, req2, req3, ...);
     request.join(
-      request("/local-contacts"),
+      request(options),
       request.get("/local-contacts"),
       request.jsonp(FacebookContacts, "jsoncallback"),
       request.jsonp(TwitterContacts, "callback")
@@ -115,6 +115,8 @@ API & Advanced Usage
 `http`, `https`, `head`, `get`, `post`, `put`, `delete`, `options`, `jsonp`, `join`
 
 Note: might change `delete` to `del` if `es3` keyword `delete` causes conflict. Not yet tested.
+
+Note: anywhere that `options` used you may use the `uri` string instead
 
 AHR.http(options, *[callback]*);
 ----
