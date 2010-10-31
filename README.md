@@ -92,7 +92,7 @@ JSONP
 
 Joining Requests
 
-    // In the browser version Futures.promise and Futures.join are included, but not in the global namespace
+    // request.join(req1, req2, req3, ...);
     request.join(
       request("/local-contacts"),
       request.get("/local-contacts"),
