@@ -68,7 +68,7 @@
     test.options = test.options || {};
     test.options.uri = test.uri;
     test.options.params = test.params;
-    ahr.http(test.options).when(function (err, data, response) {
+    ahr.http(test.options).when(function (err, response, data) {
       if (err || !data || !data.match(test.regex)) {
         console.log("\n'" + test.key + "' FAIL...");
         console.log('Status: ' + response.statusCode);

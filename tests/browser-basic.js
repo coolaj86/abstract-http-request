@@ -9,15 +9,12 @@
     "encodedUrl": "http://www.google.com/search?hl=en&client=firefox-a&rls=org.mozilla%3Aen-US%3Aofficial&q=%22json+to+x-www-form-urlencoded%22&aq=f&aqi=&aql=&oq=&gs_rfai=",
   }
 
-  function responseTest(err, data, response) {
-  }
-
   Object.keys(tests).forEach(function (key) {
     // As simple as it gets
     ahr.http({
       url: tests[key],
       method: 'GET'
-    }).when(function (err, data, xhr) {
+    }).when(function (err, xhr, data) {
       if (err) {
         console.log("\n'" + key + "' FAIL...");
         console.log('Status: ' + xhr.statusText);

@@ -14,6 +14,8 @@ Currently the following are supported:
     * If jQuery is detected, uses jQuery instead
 
   * Node.js (Http.Client, auto-redirects on 3xx responses)
+    * **API-compatibel with [`node-request`](http://github.com/mikeal/node-utils/tree/master/request/)**
+      * Passes `node-request` tests. Any break from `node-request`'s documented API should be filed as bug
     * JSONP via http Client
     * Automatically redirects on 3xx requests (excluding 304)
     * Automatically handles base64 encoding of HTTP Basic Authentication
@@ -21,11 +23,12 @@ Currently the following are supported:
 Goals
 ----
 
-  * **Make consistent with [`request`](http://github.com/mikeal/node-utils/tree/master/request/)**
   * XHR2 / CORS support, (with option plugin for post form / iframe tricks)
   * Echo server to test browser requests against
+  * Abstract response object
+  * methodOverride
 
-Installation
+Installation & Basic Usage
 ====
 
 Browser:
@@ -33,28 +36,94 @@ Browser:
     <script src="ahr.all.js"></script>
     // Has a super-simple `require` wrapper for convenience
     // ahr is not put into the global namespace by default
-    var ahr = require('ahr');
+    var request = require('ahr');
 
 Node.JS:
 
     npm install ahr
-    var ahr = require('ahr');
+    var request = require('ahr');
 
-API & Usage
+Usage:
+----
+
+Futures-style multi-callbacks
+
+    request(options)
+      .when(function (err, Xhr_Or_NodeResponse, data) {
+        if (err) {
+          // handle error
+        }
+        // handle data
+      })
+      .when(nextCallback)
+      .when(nextNextCallback);
+
+Node-style callback
+
+    // request(options, callback);
+    request(options, function (err, Xhr_Or_NodeResponse) {
+      if (err) {
+        // handle error
+      }
+      // handle data
+    });
+
+jQuery-like shorthand (both styles of callbacks supported)
+
+GET
+    // request.get(resource, params, options)
+    request.get("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000})
+      .when(function (err, Xhr_Or_NodeResponse, data) {
+        console.log(err);
+        console.log(data);
+      });
+
+POST
+    // request.post(resource, params, body, options)
+    request.post("/resource", {}, body, options)
+
+JSONP
+    // request.jsonp(resource, jsonp, params, options)
+    request.jsonp("/resource", "jsonpcallback", {foo: "bar", baz: "gizmo"}, {timeout: 10000})
+      .when(function (err, Xhr_Or_NodeResponse, data) {
+        console.log(err);
+        console.log(data);
+      });
+
+Joining Requests
+
+    // In the browser version Futures.promise and Futures.join are included, but not in the global namespace
+    request.join(
+      request("/local-contacts"),
+      request.get("/local-contacts"),
+      request.jsonp(FacebookContacts, "jsoncallback"),
+      request.jsonp(TwitterContacts, "callback")
+    ).when(function (fbcResp, tcResp) {
+      var fbc, tc;
+      fbc = { err: fbcResp[0], xhr: fbcResp[1], data: fbcResp[2] };
+      tc = { err: tcResp[0], xhr: tcResp[1], data: tcResp[2] };
+      if (fbc.err || tc.err) {
+        console.log(fbc.err);
+        console.log(tc.err);
+      }
+    });
+
+
+API & Advanced Usage
 ====
 
-`http`, `https`, `head`, `get`, `post`, `put`, `delete`, `options`, `jsonp`
+`http`, `https`, `head`, `get`, `post`, `put`, `delete`, `options`, `jsonp`, `join`
 
 Note: might change `delete` to `del` if `es3` keyword `delete` causes conflict. Not yet tested.
 
-AHR.http(options);
+AHR.http(options, *[callback]*);
 ----
 
 Pass in a bunch of options, get back a promise for `err`, `data`, and the `nativeHttpClient` (either `XHR` or `Node.HCRR`)
 
     AHR.http({
-      "url": "http://user:pass@host.com:8080/p/a/t/h?query=string#hash", // parsed by node.url or jQuery
-    }).when(function (err, data, [XMLHttpRequest | node.Http.Client.Request.Response]));
+      "uri": "http://user:pass@host.com:8080/p/a/t/h?query=string#hash", // parsed by node.url or jQuery
+    }).when(function (err, [XMLHttpRequest | node.Http.Client.Request.Response], data));
 
 Default Options
 ----
@@ -63,7 +132,7 @@ Loosely modeled after [Node's Http.Client and URL API]("http://nodejs.org/api.ht
 
     var presets = {
       // Overrides Connection and Request params
-      "url": "",
+      "uri": "",
 
       // Connection Params
       "protocol": "http" | "https",
@@ -100,29 +169,29 @@ When options.body exists the default `Content-Type` will be `x-www-form-urlencod
 
 Note: In the browser jQuery is currently used. This dependency will go away shortly, I just wanted it up quickly
 
-AHR. | head | get | delete | options | (url, params, options)
+AHR. | head | get | delete | options | (uri, params, options)
 ----
 
     AHR.get("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000})
-      .when(function (err, data, [XHR | node.HCRR) {
+      .when(function (err, Xhr_Or_NodeResponse, data) {
         console.log(err);
         console.log(data);
       });
 
-AHR | post | put | (url, params, body, options)
+AHR | post | put | (uri, params, body, options)
 ----
 
 When `options.body` exists the default `Content-Type` will be `x-www-form-urlencoded`;
 
-If you have some sort of special encoding
+If you have some sort of special encoding, format `options.encodedBody` yourself and set options.headers['Content-Type'] yourself.
 
 
-AHR.jsonp(url, jsonp, params, options)
+AHR.jsonp(uri, jsonp, params, options)
 ----
 
     var flickrApi = "http://api.flickr.com/services/feeds/photos_public.gne?format=json";
     AHR.jsonp(flickApi, "jsoncallback", {tags: "cat", tagmode: "any"})
-      .when(function (err, data, xhr) {
+      .when(function (err, Xhr_Or_NodeResponse, data) {
         // do stuff
       });
 
@@ -133,7 +202,7 @@ The purpose of the syncback is to be able to get at the nativeHttpClient as soon
 
     var nodeRequest;
     AHR.https({
-      url: "http://example.com/"
+      uri: "http://example.com/"
       syncback: function(nativeClient) {
         nodeRequest = nativeClient;
       }
