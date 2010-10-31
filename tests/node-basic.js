@@ -1,5 +1,5 @@
 (function () {
-  var ahr = require('../lib/ahr'),
+  var request = require('../lib/ahr'),
     tests;
 
   tests = [
@@ -70,7 +70,7 @@
     test.options = test.options || {};
     test.options.uri = test.uri;
     test.options.params = test.params;
-    ahr.http(test.options).when(function (err, response, data) {
+    request.http(test.options).when(function (err, response, data) {
       if (err || !data || !data.match(test.regex)) {
         console.log("\n'" + test.key + "' FAIL...");
         console.log('Status: ' + response.statusCode);
@@ -106,7 +106,7 @@
     test.options.uri = test.uri;
     test.options.params = test.params;
     all.push(
-      ahr.http(test.options)
+      request.http(test.options)
         .when(function (err, response, data) {
             handleResponses.call(null, err, response, data, i);
         })
@@ -114,7 +114,7 @@
   });
 
   console.log("If nothing happens, then the joins failed");
-  ahr.join(all)
+  request.join(all)
     .when(function (arr) {
       console.log("'join' Passes.");
     });
