@@ -63,6 +63,8 @@
     }
   ];
 
+  
+  /*
   tests.forEach(function (test) {
     // As simple as it gets
     test.options = test.options || {};
@@ -80,4 +82,41 @@
       console.log("'" + test.key + "' Passes Expected Regex Match");
     });
   });
+  */
+
+  //.when(handleResponses));
+  function handleResponses(err, response, data, i) {
+    var test = tests[i];
+    if (err || !data || !data.match(test.regex)) {
+      console.log("\n'" + test.key + "' FAIL...");
+      console.log('Status: ' + response.statusCode);
+      console.log('Headers: ' + JSON.stringify(response.headers));
+      console.log('Error: ' + err);
+      console.log('Data: ' + data.substring(0,100) + '...');
+      return;
+    }
+    console.log("'" + test.key + "' Passes Expected Regex Match");
+  }
+
+
+  var all = [];
+  tests.forEach(function (test, i) {
+    // As simple as it gets
+    test.options = test.options || {};
+    test.options.uri = test.uri;
+    test.options.params = test.params;
+    all.push(
+      ahr.http(test.options)
+        .when(function (err, response, data) {
+            handleResponses.call(null, err, response, data, i);
+        })
+    );
+  });
+
+  console.log("If nothing happens, then the joins failed");
+  ahr.join(all)
+    .when(function (arr) {
+      console.log("'join' Passes.");
+    });
+
 }());
