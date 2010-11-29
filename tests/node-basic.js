@@ -60,7 +60,27 @@
       params: { tags: "cat", tagmode: "any", "jsoncallback": "jsonp_" + (new Date()).valueOf() },
       options: { jsonp: "jsoncallback" },
       regex: /jsonp_\d+\(/
-    }
+    },
+    {
+      key: "file_relative_path1",
+      uri: "16kb.dat",
+      regex: /E\nF/
+    },
+    {
+      key: "file_relative_path2",
+      uri: "./16kb.dat",
+      regex: /E\nF/
+    },
+    {
+      key: "file_relative_path3",
+      uri: "file:16kb.dat",
+      regex: /E\nF/
+    },
+    {
+      key: "file_absolute_path",
+      uri: "file:///tmp/16kb.dat",
+      regex: /E\nF/
+    },
   ];
 
   
