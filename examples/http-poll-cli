@@ -1,0 +1,42 @@
+#!/usr/bin/env node
+(function () {
+  var util = require('util'),
+    fs = require('fs'),
+    poll = require('./http-poll.js'),
+    url = process.argv[2],
+    count = 0,
+    maxLogFiles = parseInt(process.argv[3],10) || 0,
+    padding = maxLogFiles.toString().length;
+
+  if (!url) {
+    util.puts('Usage: http-poll-cli url [max-files-to-log]');
+    return;
+  }
+
+  function padLeft(str, num, chr) {
+    str = str.toString();
+    while (str.length < num) {
+      str = chr + str;
+    }
+    return str;
+  }
+
+  function logData(data) {
+    var num = count % maxLogFiles;
+    fs.writeFile(['download.', padLeft(num, padding, 0), '.dat'].join(''), data, function (err) {
+      console.log(data);
+      util.debug(JSON.stringify(err));
+    });
+  }
+
+  poll(url, function (err, data) {
+    count += 1;
+    if (err) {
+      util.debug(JSON.stringify(err));
+      return;
+    }
+    if (maxLogFiles && data) {
+      logData(data);
+    }
+  });
+}());
