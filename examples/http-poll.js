@@ -1,5 +1,5 @@
 (function () {
-  var request = require('ahr'),
+  var request = require('../lib/ahr'),
     Futures = require('futures');
 
   function create(uri, func) {
