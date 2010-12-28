@@ -8,5 +8,5 @@
   "dependencies"  : ["futures"],
   "lib"           : "lib",
   "main"          : "./lib/ahr",
-  "version"       : "0.9.7"
+  "version"       : "0.9.8"
 }
