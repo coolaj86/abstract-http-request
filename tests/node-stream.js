@@ -2,7 +2,7 @@ var request = require("../lib/ahr.js"),
   result = true,
   count = 0;
 
-request({ uri:"file:256kb.dat", stream: true }).when(function (err, fs, data, end) {
+request({ uri:"file:256kb.dat", stream: true }).whenever(function (err, fs, data, end) {
   if (err) {
     console.log(err);
   }

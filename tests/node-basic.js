@@ -58,7 +58,7 @@
       key: "jsonp",
       uri: "http://api.flickr.com/services/feeds/photos_public.gne?format=json",
       params: { tags: "cat", tagmode: "any", "jsoncallback": "jsonp_" + (new Date()).valueOf() },
-      options: { jsonp: "jsoncallback" },
+      //options: { jsonp: "jsoncallback" }, // turn off jsonp for regex matching
       regex: /jsonp_\d+\(/
     },
     {
@@ -107,6 +107,9 @@
   //.when(handleResponses));
   function handleResponses(err, response, data, i) {
     var test = tests[i];
+    if (data instanceof Buffer) {
+      data = data.toString();
+    }
     if (err || !data || !data.match(test.regex)) {
       console.log("\n'" + test.key + "' FAIL...");
       console.log('Status: ' + response.statusCode);
