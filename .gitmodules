@@ -1,3 +1,9 @@
 [submodule "vendor/futures"]
 	path = vendor/futures
 	url = git://github.com/coolaj86/futures.git
+[submodule "vendor/require-kiss"]
+	path = vendor/require-kiss
+	url = git://github.com/coolaj86/require-kiss-js.git
+[submodule "vendor/bufferjs"]
+	path = vendor/bufferjs
+	url = git://github.com/coolaj86/node-bufferjs.git
