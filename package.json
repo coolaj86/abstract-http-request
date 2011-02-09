@@ -6,9 +6,10 @@
   "author"        : "AJ ONeal <coolaj86@gmail.com>",
   "contributors"  : [],
   "dependencies"  : {
-                      "futures": ">= 1.9.0"
+                      "futures": ">= 1.9.0",
+                      "bufferjs": ">= 0.0.0"
                     },
   "lib"           : "lib",
   "main"          : "./lib/ahr",
-  "version"       : "0.9.9"
+  "version"       : "0.9.10"
 }
