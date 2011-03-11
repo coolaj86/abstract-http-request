@@ -1,39 +1,67 @@
-/*jslint browser: true, devel: true, debug: true, es5: true, onevar: true, undef: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, newcap: true, immed: true, strict: true */
-/*
-  var window = {}, exports = {}, module = {}, global = {};
-*/
-// Implementation of require(), modules, exports, and provide to the browser
+/*jslint onevar: true, undef: true, newcap: true, regexp: true, plusplus: true, bitwise: true, devel: true, maxerr: 50, indent: 2 */
+/*global module: true, exports: true, provide: true */
+var global = global || (function () { return this; }()),
+  __dirname = __dirname || '';
 (function () {
-    "use strict";
-    if ('undefined' !== typeof window && 'undefined' !== typeof alert) {
-      (function () {
-        var global = window;
-        function resetModule() {
-          global.module = {};
-          global.exports = {};
-          global.module.exports = exports;
-        }
-        global._PLUGIN_EXPORTS = global._PLUGIN_EXPORTS || {};
-        global.require = function (name) {
-          var plugin = global._PLUGIN_EXPORTS[name] || global[name],
-            msg = "One of the included scripts requires '" + 
-              name + "', which is not loaded. " +
-              "\nTry including '<script src=\"" + name + ".js\"></script>'.\n";
-          if ('undefined' === typeof plugin) {
-            alert(msg);
-            throw new Error(msg);
-          }
-          return plugin;
-        };
-        global.provide = function (name) {
-          global._PLUGIN_EXPORTS[name] = module.exports;
-          resetModule();
-        };
-        resetModule();
-      }());
-    } else {
-      global.provide = function () {};
+  "use strict";
+
+  var thrownAlready = false;
+
+  function ssjsProvide(exports) {
+    //module.exports = exports || module.exports;
+  }
+
+  function resetModule() {
+    global.module = {};
+    global.exports = {};
+    global.module.exports = exports;
+  }
+
+  function normalize(name) {
+    if ('./' === name.substr(0,2)) {
+      name = name.substr(2);
     }
+    return name;
+  }
+
+  function browserRequire(name) {
+    var mod,
+      msg = "One of the included scripts requires '" + 
+        name + "', which is not loaded. " +
+        "\nTry including '<script src=\"" + name + ".js\"></script>'.\n";
+
+    name = normalize(name);
+    mod = global.__REQUIRE_KISS_EXPORTS[name] || global[name];
+
+    if ('undefined' === typeof mod && !thrownAlready) {
+      thrownAlready = true;
+      alert(msg);
+      throw new Error(msg);
+    }
+
+    return mod;
+  }
+
+  function browserProvide(name, new_exports) {
+    name = normalize(name);
+    global.__REQUIRE_KISS_EXPORTS[name] = new_exports || module.exports;
+    resetModule();
+  }
+
+  if (global.require) {
+    if (global.provide) {
+      return;
+    }
+    global.provide = ssjsProvide;
+    return;
+  }
+
+  global.__REQUIRE_KISS_EXPORTS = global.__REQUIRE_KISS_EXPORTS || {};
+  global.require = global.require || browserRequire;
+  global.provide = global.provide || browserProvide;
+  resetModule();
+
+  provide('require-kiss');
 }());
 
 /*!
@@ -646,6 +674,7 @@ if (!String.prototype.trim) {
   provide("url");
 }());
 // promise, future, deliver, fulfill
+var provide = provide || function () {};
 (function () {
   "use strict";
 
@@ -700,7 +729,7 @@ if (!String.prototype.trim) {
 
     self.setContext = function (context) {
       global_context = context;
-    }
+    };
 
     self.setTimeout = function (new_time) {
       time = new_time;
@@ -724,7 +753,7 @@ if (!String.prototype.trim) {
 
       args.unshift(undefined);
       self.deliver.apply(self, args);
-    }
+    };
 
 
 
@@ -792,7 +821,7 @@ if (!String.prototype.trim) {
 
     self.hasCallback = function () {
       return !!findCallback.apply(self, arguments);
-    }
+    };
 
 
 
@@ -903,8 +932,8 @@ if (!String.prototype.trim) {
       return self;
     };
 
-    
-    // 
+
+    //
     function privatize(obj, pubs) {
       var result = {};
       pubs.forEach(function (pub) {
@@ -934,7 +963,6 @@ if (!String.prototype.trim) {
   Future.isFuture = isFuture;
   module.exports = Future;
 
-  provide = ('undefined' !== typeof provide) ? provide : function () {};
   provide('futures/future');
 }());
 /*jslint devel: true, debug: true, es5: true, onevar: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, newcap: true, immed: true, strict: true */
@@ -954,6 +982,8 @@ if (!String.prototype.trim) {
 (function (undefined) {
   "use strict";
 
+  require('require-kiss');
+
   var url = require('url'),
     Futures = require('futures'),
     ahr, ahr_doc,
@@ -967,8 +997,8 @@ if (!String.prototype.trim) {
   };
   ahr.join = Futures.join;
 
-  if ('undefined' !== typeof console) {
-    ahr.log = console.log || function () {};
+  if ('undefined' !== typeof global.console) {
+    ahr.log = global.console.log || function () {};
   }
   ahr.log = (!debug) ? function () {} : (ahr.log || function () {});
   
@@ -1507,7 +1537,13 @@ if (!String.prototype.trim) {
         clearTimeout(timeout);
         ct = xhr.getResponseHeader("content-type") || "";
         xml = /* type === "xml" || !type && */ ct.indexOf("xml") >= 0;
+        json = /* type === "xml" || !type && */ ct.indexOf("json") >= 0;
         data = xml ? xhr.responseXML : xhr.responseText;
+        try {
+          data = json ? JSON.parse(json) : data;
+        } catch(e) {
+          err = e;
+        }
         if (xhr.status >= 400) {
           err = xhr.status;
         }
@@ -1746,6 +1782,5 @@ if (!String.prototype.trim) {
   };
 
   module.exports = ahr;
-  if ('undefined' === typeof provide) { provide = function () {}; }
-  provide('ahr');
+  provide('ahr', module.exports);
 }());
