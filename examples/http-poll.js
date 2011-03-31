@@ -3,15 +3,15 @@
     Futures = require('futures');
 
   function create(uri, func) {
-    var subscription = Futures.subscription();
+    var future = Futures.future();
 
     if (func) {
-      subscription.subscribe(func);
+      future.whenever(func);
     }
 
     function makeRequest() {
       request(uri, function (err, ahr, data) {
-        subscription.deliver(err, data);
+        future.deliver(err, data);
         makeRequest();
       });
     }
