@@ -1,47 +1,41 @@
 (function () {
-  var request = require('../lib/ahr'),
-    tests;
+  "use strict";
+
+  var request = require('../lib/ahr')
+    , tests
+    , File = require('file-api').File;
 
   tests = [
+  /*
     {
       key: "simple200",
-      uri: "http://www.google.com",
+      href: "http://www.google.com",
       regex: /Google Search/
     },
     {
       key: "port80",
-      uri: "http://www.google.com:80",
+      href: "http://www.google.com:80",
       regex: /Google Search/
     },
     {
       key: "port5984",
-      uri: "http://mikeal.couchone.com:5984",
+      href: "http://mikeal.couchone.com:5984",
       regex: /{"couchdb":"Welcome","version":"1/
     },
     {
-      key: "POST json",
-      uri: "http://mikeal.couchone.com:5984/testjs",
-      options: {
-        method:'POST',
-        headers: { 'content-type': 'application/json', 'accept': 'application/json'},
-        body: { _id: Math.floor(Math.random()*100000000).toString() }
-      },
-      regex: /"ok":true/
-    },
-    {
       key: "redirect301",
-      uri: "http://coolaj86.github.com",
+      href: "http://coolaj86.github.com",
       regex: /CoolAJ86/
     },
     {
       key: "encodedUrl",
-      uri: "http://www.google.com/search?hl=en&client=firefox-a&rls=org.mozilla%3Aen-US%3Aofficial&q=%22json+to+x-www-form-urlencoded%22&aq=f&aqi=&aql=&oq=&gs_rfai=",
+      href: "http://www.google.com/search?hl=en&client=firefox-a&rls=org.mozilla%3Aen-US%3Aofficial&q=%22json+to+x-www-form-urlencoded%22&aq=f&aqi=&aql=&oq=&gs_rfai=",
       regex: /x-www-form-urlencoded/
     },
     {
       key: "encodedParams",
-      uri: "http://www.google.com/search",
-      params: { 
+      href: "http://www.google.com/search",
+      query: { 
         hl: "en",
         client: "firefox-a",
         rls: "org.mozilla:en-US:official",
@@ -56,40 +50,61 @@
     },
     {
       key: "jsonp",
-      uri: "http://api.flickr.com/services/feeds/photos_public.gne?format=json",
-      params: { tags: "cat", tagmode: "any", "jsoncallback": "jsonp_" + (new Date()).valueOf() },
+      href: "http://api.flickr.com/services/feeds/photos_public.gne?format=json",
+      query: { tags: "cat", tagmode: "any", "jsoncallback": "jsonp_" + (new Date()).valueOf() },
       //options: { jsonp: "jsoncallback" }, // turn off jsonp for regex matching
       regex: /jsonp_\d+\(/
     },
     {
-      key: "file_relative_path1",
-      uri: "16kb.dat",
-      regex: /E\nF/
+      key: "POST json",
+      href: "http://mikeal.couchone.com:5984/testjs",
+      options: {
+        method:'POST',
+        headers: { 'content-type': 'application/json', 'accept': 'application/json'},
+        body: { _id: Math.floor(Math.random()*100000000).toString() }
+      },
+      regex: /"ok":true/
+    },
+  */
+    {
+      key: "POST 16kb locally",
+      href: "http://127.0.0.1:9000/blah",
+      options: {
+        method:'POST',
+        headers: { 'accept': 'application/json'},
+        body: {
+            file_name: 'super hexabet file'
+          , upload_file: new File('/tmp/16kb.dat')
+        }
+      },
+      regex: /Upload in progress/
     },
     {
-      key: "file_relative_path2",
-      uri: "./16kb.dat",
-      regex: /E\nF/
-    },
-    {
-      key: "file_relative_path3",
-      uri: "file:16kb.dat",
-      regex: /E\nF/
-    },
-    {
-      key: "file_absolute_path",
-      uri: "file:///tmp/16kb.dat",
-      regex: /E\nF/
-    },
+      key: "POST 2 1kb locally",
+      href: "http://127.0.0.1:9000/blah",
+      options: {
+        chunked: true,
+        method:'POST',
+        headers: { 'accept': 'application/json'},
+        body: {
+            file_name_0: 'super alhpa file'
+          , file_name_1: 'super beta file'
+          , upload_file_0: new File('/tmp/1k_a.dat')
+          , upload_file_1: new File('/tmp/1k_b.dat')
+        }
+      },
+      regex: /Upload in progress/
+    }
+  /*
+  */
   ];
-
   
   /*
   tests.forEach(function (test) {
     // As simple as it gets
     test.options = test.options || {};
-    test.options.uri = test.uri;
-    test.options.params = test.params;
+    test.options.href = test.href;
+    test.options.query = test.query;
     request.http(test.options).when(function (err, response, data) {
       if (err || !data || !data.match(test.regex)) {
         console.log("\n'" + test.key + "' FAIL...");
@@ -111,11 +126,13 @@
       data = data.toString();
     }
     if (err || !data || !data.match(test.regex)) {
+      console.log("\n\n");
       console.log("\n'" + test.key + "' FAIL...");
       console.log('Status: ' + response.statusCode);
       console.log('Headers: ' + JSON.stringify(response.headers));
       console.log('Error: ' + err);
-      console.log('Data: ' + data.substring(0,100) + '...');
+      console.log('Data: ' + data.substring(0,200) + '...');
+      console.log("\n\n");
       return;
     }
     console.log("'" + test.key + "' Passes Expected Regex Match");
@@ -126,8 +143,8 @@
   tests.forEach(function (test, i) {
     // As simple as it gets
     test.options = test.options || {};
-    test.options.uri = test.uri;
-    test.options.params = test.params;
+    test.options.href = test.href;
+    test.options.query = test.query;
     all.push(
       request.http(test.options)
         .when(function (err, response, data) {
