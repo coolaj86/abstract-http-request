@@ -6,6 +6,7 @@
     , File = require('file-api').File;
 
   tests = [
+  /*
     {
       key: "simple200",
       href: "http://www.google.com",
@@ -63,7 +64,39 @@
         body: { _id: Math.floor(Math.random()*100000000).toString() }
       },
       regex: /"ok":true/
+    },
+  */
+    {
+      key: "POST 16kb locally",
+      href: "http://127.0.0.1:9000/blah",
+      options: {
+        method:'POST',
+        headers: { 'accept': 'application/json'},
+        body: {
+            file_name: 'super hexabet file'
+          , upload_file: new File('/tmp/16kb.dat')
+        }
+      },
+      regex: /Upload in progress/
+    },
+    {
+      key: "POST 2 1kb locally",
+      href: "http://127.0.0.1:9000/blah",
+      options: {
+        chunked: true,
+        method:'POST',
+        headers: { 'accept': 'application/json'},
+        body: {
+            file_name_0: 'super alhpa file'
+          , file_name_1: 'super beta file'
+          , upload_file_0: new File('/tmp/1k_a.dat')
+          , upload_file_1: new File('/tmp/1k_b.dat')
+        }
+      },
+      regex: /Upload in progress/
     }
+  /*
+  */
   ];
   
   /*
