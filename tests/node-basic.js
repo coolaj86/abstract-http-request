@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  var request = require('../lib/ahr')
+  var request = require('../lib/ahr2')
     , tests
     , File = require('file-api').File;
 

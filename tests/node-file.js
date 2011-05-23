@@ -1,5 +1,5 @@
 (function () {
-  var request = require('../lib/ahr'),
+  var request = require('../lib/ahr2'),
     tests;
 
   tests = [
