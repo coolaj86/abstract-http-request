@@ -5,19 +5,19 @@ Note: The version 2.0 API is may change, but should stabalize by 2.1.0
 
 Abstract HTTP Request is a lightweight HTTP Client for both **Node.JS** as well as **Modern Browsers** which handles:
 
-    * JSONP
-    * Cross-Origin Resource Sharing (CORS)
-      * Access-Control (AC) + XMLHttpRequest Level 2 (XHR2)
-      * XDomainRequest (XDR)
-    * Binary downloads (overrideMimeType hack)
-    * HTML5 FileApi
-      * Binary uploads
-      * FormData
-      * File
-      * FileList
-    * Automatically redirects on 3xx requests (excluding 304)
-    * HTTP Basic Auth
-    * Join multiple requests together (see the **shorthand** section below)
+  * JSONP
+  * Cross-Origin Resource Sharing (CORS)
+    * Access-Control (AC) + XMLHttpRequest Level 2 (XHR2)
+    * XDomainRequest (XDR)
+  * Binary downloads (overrideMimeType hack)
+  * HTML5 FileApi
+    * Binary uploads
+    * FormData
+    * File
+    * FileList
+  * Automatically redirects on 3xx requests (excluding 304)
+  * HTTP Basic Auth
+  * Join multiple requests together (see the **shorthand** section below)
 
 Supported Platforms:
 
