@@ -145,6 +145,9 @@ Loosely modeled after the [Node.JS Http.Client and URL API]("http://nodejs.org/a
         , "body": undefined        // see section below
         , "encodedBody": undefined // if you encode the body yourself 
 
+          // Response Params
+        , "responseEncoder": function (responseText) { return Custom.parse(responseText) } // a function to parse / encode data
+
           // Timeout after 20 seconds
         , "timeout": 20000
     }

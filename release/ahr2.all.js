@@ -2946,6 +2946,11 @@ var window;
     ct = ct.toLowerCase();
 
     if ('binary' === ct) {
+      // TODO how to wrap this for the browser and Node??
+      if (options.responseEncoder) {
+        return options.responseEncoder(text);
+      }
+
       // TODO only Chrome 13 currently handles ArrayBuffers well
       // imageData could work too
       // http://synth.bitsnbites.eu/
@@ -3030,7 +3035,7 @@ var window;
         // and the response starts
         req.emit('loadstart', ev);
         resetTimeout();
-    });
+    }, true);
     xhr2.addEventListener('progress', function (ev) {
         if (!req.loaded) {
           req.loaded = true;
@@ -3044,53 +3049,55 @@ var window;
         }
         res.emit('progress', ev);
         resetTimeout();
-    });
+    }, true);
     xhr2.addEventListener('load', function (ev) {
+      var text;
+      text = xhr2.responseText;
       if (xhr2.status >= 400) {
         ev.error = new Error(xhr2.status);
       }
       ev.target.result = encodeData(options, xhr2);
       res.emit('load', ev);
-    });
+    }, true);
     /*
     xhr2Request.addEventListener('loadstart', function (ev) {
       req.emit('loadstart', ev);
       resetTimeout();
-    });
+    }, true);
     */
     xhr2Request.addEventListener('load', function (ev) {
       resetTimeout();
       req.emit('load', ev);
       res.loadstart = true;
       res.emit('loadstart', {});
-    });
+    }, true);
     xhr2Request.addEventListener('progress', function (ev) {
       resetTimeout();
       req.emit('progress', ev);
-    });
+    }, true);
 
 
     /* Error States */
     xhr2.addEventListener('abort', function (ev) {
       res.emit('abort', ev);
-    });
+    }, true);
     xhr2Request.addEventListener('abort', function (ev) {
       req.emit('abort', ev);
-    });
+    }, true);
     xhr2.addEventListener('error', function (ev) {
       res.emit('error', ev);
-    });
+    }, true);
     xhr2Request.addEventListener('error', function (ev) {
       req.emit('error', ev);
-    });
+    }, true);
     // the "Request" is what timeouts
     // the "Response" will timeout as well
     xhr2.addEventListener('timeout', function (ev) {
       req.emit('timeout', ev);
-    });
+    }, true);
     xhr2Request.addEventListener('timeout', function (ev) {
       req.emit('timeout', ev);
-    });
+    }, true);
 
     /* Cleanup */
     res.on('loadend', function () {
@@ -3131,7 +3138,6 @@ var window;
 
   function send(req, res) {
     var options = req.userOptions;
-    console.log('options', options);
     if (options.jsonp && options.jsonpCallback) {
       return browserJsonpClient(req, res);
     }
@@ -3639,7 +3645,10 @@ var window;
     // any error in the quest causes the response also to fail
     emitter.on('loadend', function (ev) {
       emitter.done = true;
-      ev.target = ev.target || {};
+      // in FF this is only a getter, setting is not allowed
+      if (!ev.target) {
+        ev.target = {};
+      }
       promise.fulfill(ev.error, emitter, ev.target.result, ev.err ? false : true);
     });
     emitter.on('timeout', function (ev) {
