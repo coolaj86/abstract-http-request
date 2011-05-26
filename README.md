@@ -50,7 +50,7 @@ Installation
 
 **Node.JS**
 
-    npm install ahr
+    npm install ahr2
 
 Usage
 ====
