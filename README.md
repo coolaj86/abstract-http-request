@@ -1,7 +1,7 @@
 AbstractHttpRequest
 ====
 
-Note: The version 2.0 API is may change, but should stabalize by 2.1.0
+Note: The version 2.0 API may change, but should stabalize by 2.1.0
 
 Abstract HTTP Request is a lightweight HTTP Client for both **Node.JS** as well as **Modern Browsers** which handles:
 
@@ -45,7 +45,7 @@ Installation
   Standalone:
 
     git submodule init && git submodule update
-    ./mkahr
+    ./mkahr.sh
     <script src="ahr2.all.js"></script>
 
 **Node.JS**
