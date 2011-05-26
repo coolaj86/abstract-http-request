@@ -23,6 +23,6 @@
   "directories"   : {
                       "lib": "lib"
                     },
-  "main"          : "./lib/ahr",
+  "main"          : "./lib/ahr2",
   "version"       : "2.0.0"
 }
