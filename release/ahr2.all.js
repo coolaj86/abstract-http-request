@@ -3469,24 +3469,23 @@ var window;
         options.encodedBody = options.body;
       }
 
-      if (!options.encodedBody) {
-        if (options.headers["content-type"]) {
-          if (options.headers["content-type"].match(/application\/json/) || 
-              options.headers["content-type"].match(/text\/javascript/)) {
-            options.encodedBody = JSON.stringify(options.body);
-          }
-        } else if (!options.headers["content-type"] ||
-                   options.headers["content-type"].match(/application\/x-www-form-urlencoded/)) {
-          options.encodedBody = uriEncodeObject(options.body);
-        } else if (!options.encodedBody) {
-          throw new Error("'" + options.headers["content-type"] + "'" + "is not yet supported and you have not specified 'encodedBody'");
-        }
-        options.headers["content-length"] = options.encodedBody.length;
-      }
-
-      // TODO put this first?
       if (!options.headers["content-type"]) {
         options.headers["content-type"] = "application/x-www-form-urlencoded";
+      }
+
+      if (!options.encodedBody) {
+        if (options.headers["content-type"].match(/application\/json/) || 
+            options.headers["content-type"].match(/text\/javascript/)) {
+          options.encodedBody = JSON.stringify(options.body);
+        } else if (options.headers["content-type"].match(/application\/x-www-form-urlencoded/)) {
+            options.encodedBody = uriEncodeObject(options.body);
+        }
+
+        if (!options.encodedBody) {
+          throw new Error("'" + options.headers["content-type"] + "'" + "is not yet supported and you have not specified 'encodedBody'");
+        }
+
+        options.headers["content-length"] = options.encodedBody.length;
       }
     }
 
@@ -3538,6 +3537,9 @@ var window;
 /*jslint devel: true, debug: true, es5: true, onevar: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, newcap: true, immed: true, strict: true */
 (function () {
   "use strict";
+
+  // TODO use Ender.JS in place of require-kiss
+  require('require-kiss');
 
   var ahrOptions = require('./ahr-options')
     , utils = require('./utils')
