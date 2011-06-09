@@ -419,11 +419,11 @@ var window;
 
     if (ct.indexOf("json") >= 0) {
       try {
-        data = JSON.parse(txt);
+        data = JSON.parse(text);
       } catch(e) {
-        data = undefined;
+        data = text;
       }
-      return text;
+      return data;
     }
 
     return xhr2.responseText;
@@ -508,6 +508,7 @@ var window;
     */
     xhr2Request.addEventListener('load', function (ev) {
       resetTimeout();
+      req.loaded = true;
       req.emit('load', ev);
       res.loadstart = true;
       res.emit('loadstart', {});
@@ -1165,7 +1166,9 @@ var window;
 
     // if the request fails, then the response must also fail
     req.on('error', function (err, ev) {
-      res.emit('error', err, ev);
+      if (!res.error) {
+        res.emit('error', err, ev);
+      }
     });
     req.on('timeout', function (ev) {
       res.emit('timeout', ev);
