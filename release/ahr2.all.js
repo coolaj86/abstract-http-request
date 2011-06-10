@@ -2939,13 +2939,25 @@ var window;
   function encodeData(options, xhr2) {
     var data
       , ct = options.overrideResponseType || xhr2.getResponseHeader("content-type") || ""
-      , text = xhr2.responseText
-      , len = text.length
+      , text
+      , len
       ;
 
     ct = ct.toLowerCase();
 
+    if (xhr2.responseType && xhr2.response) {
+      text = xhr2.response;
+    } else {
+      text = xhr2.responseText;
+    }
+
+    len = text.length;
+
     if ('binary' === ct) {
+      if (window.ArrayBuffer && xhr2.response instanceof window.ArrayBuffer) {
+        return xhr2.response;
+      }
+
       // TODO how to wrap this for the browser and Node??
       if (options.responseEncoder) {
         return options.responseEncoder(text);
@@ -2996,7 +3008,6 @@ var window;
       ;
 
     function onTimeout() {
-        ahr.log('timeout-log browserHttpClient-2');
         req.emit("timeout", {});
     }
 
@@ -3051,8 +3062,6 @@ var window;
         resetTimeout();
     }, true);
     xhr2.addEventListener('load', function (ev) {
-      var text;
-      text = xhr2.responseText;
       if (xhr2.status >= 400) {
         ev.error = new Error(xhr2.status);
       }
@@ -3117,6 +3126,7 @@ var window;
     setTimeout(function () {
       if ('binary' === options.overrideResponseType) {
         xhr2.overrideMimeType("text/plain; charset=x-user-defined");
+        xhr2.responseType = 'arraybuffer';
       }
       try {
         xhr2.send(options.encodedBody);
@@ -3462,7 +3472,8 @@ var window;
         options.encodedBody = options.body;
       }
       if (options.encodedBody instanceof FormData) {
-        options.headers["content-type"] = "multipart/form-data";
+          // TODO: is this necessary? This breaks in the browser
+//        options.headers["content-type"] = "multipart/form-data";
         return;
       }
 
