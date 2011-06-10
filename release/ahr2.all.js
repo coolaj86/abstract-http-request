@@ -2939,13 +2939,25 @@ var window;
   function encodeData(options, xhr2) {
     var data
       , ct = options.overrideResponseType || xhr2.getResponseHeader("content-type") || ""
-      , text = xhr2.responseText
-      , len = text.length
+      , text
+      , len
       ;
 
     ct = ct.toLowerCase();
 
+    if (xhr2.responseType && xhr2.response) {
+      text = xhr2.response;
+    } else {
+      text = xhr2.responseText;
+    }
+
+    len = text.length;
+
     if ('binary' === ct) {
+      if (window.ArrayBuffer && xhr2.response instanceof window.ArrayBuffer) {
+        return xhr2.response;
+      }
+
       // TODO how to wrap this for the browser and Node??
       if (options.responseEncoder) {
         return options.responseEncoder(text);
@@ -2978,11 +2990,11 @@ var window;
 
     if (ct.indexOf("json") >= 0) {
       try {
-        data = JSON.parse(txt);
+        data = JSON.parse(text);
       } catch(e) {
-        data = undefined;
+        data = text;
       }
-      return text;
+      return data;
     }
 
     return xhr2.responseText;
@@ -2996,7 +3008,6 @@ var window;
       ;
 
     function onTimeout() {
-        ahr.log('timeout-log browserHttpClient-2');
         req.emit("timeout", {});
     }
 
@@ -3051,8 +3062,6 @@ var window;
         resetTimeout();
     }, true);
     xhr2.addEventListener('load', function (ev) {
-      var text;
-      text = xhr2.responseText;
       if (xhr2.status >= 400) {
         ev.error = new Error(xhr2.status);
       }
@@ -3067,6 +3076,7 @@ var window;
     */
     xhr2Request.addEventListener('load', function (ev) {
       resetTimeout();
+      req.loaded = true;
       req.emit('load', ev);
       res.loadstart = true;
       res.emit('loadstart', {});
@@ -3116,6 +3126,7 @@ var window;
     setTimeout(function () {
       if ('binary' === options.overrideResponseType) {
         xhr2.overrideMimeType("text/plain; charset=x-user-defined");
+        xhr2.responseType = 'arraybuffer';
       }
       try {
         xhr2.send(options.encodedBody);
@@ -3461,7 +3472,8 @@ var window;
         options.encodedBody = options.body;
       }
       if (options.encodedBody instanceof FormData) {
-        options.headers["content-type"] = "multipart/form-data";
+          // TODO: is this necessary? This breaks in the browser
+//        options.headers["content-type"] = "multipart/form-data";
         return;
       }
 
@@ -3469,24 +3481,23 @@ var window;
         options.encodedBody = options.body;
       }
 
-      if (!options.encodedBody) {
-        if (options.headers["content-type"]) {
-          if (options.headers["content-type"].match(/application\/json/) || 
-              options.headers["content-type"].match(/text\/javascript/)) {
-            options.encodedBody = JSON.stringify(options.body);
-          }
-        } else if (!options.headers["content-type"] ||
-                   options.headers["content-type"].match(/application\/x-www-form-urlencoded/)) {
-          options.encodedBody = uriEncodeObject(options.body);
-        } else if (!options.encodedBody) {
-          throw new Error("'" + options.headers["content-type"] + "'" + "is not yet supported and you have not specified 'encodedBody'");
-        }
-        options.headers["content-length"] = options.encodedBody.length;
-      }
-
-      // TODO put this first?
       if (!options.headers["content-type"]) {
         options.headers["content-type"] = "application/x-www-form-urlencoded";
+      }
+
+      if (!options.encodedBody) {
+        if (options.headers["content-type"].match(/application\/json/) || 
+            options.headers["content-type"].match(/text\/javascript/)) {
+          options.encodedBody = JSON.stringify(options.body);
+        } else if (options.headers["content-type"].match(/application\/x-www-form-urlencoded/)) {
+            options.encodedBody = uriEncodeObject(options.body);
+        }
+
+        if (!options.encodedBody) {
+          throw new Error("'" + options.headers["content-type"] + "'" + "is not yet supported and you have not specified 'encodedBody'");
+        }
+
+        options.headers["content-length"] = options.encodedBody.length;
       }
     }
 
@@ -3538,6 +3549,9 @@ var window;
 /*jslint devel: true, debug: true, es5: true, onevar: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, newcap: true, immed: true, strict: true */
 (function () {
   "use strict";
+
+  // TODO use Ender.JS in place of require-kiss
+  require('require-kiss');
 
   var ahrOptions = require('./ahr-options')
     , utils = require('./utils')
@@ -3722,7 +3736,9 @@ var window;
 
     // if the request fails, then the response must also fail
     req.on('error', function (err, ev) {
-      res.emit('error', err, ev);
+      if (!res.error) {
+        res.emit('error', err, ev);
+      }
     });
     req.on('timeout', function (ev) {
       res.emit('timeout', ev);
