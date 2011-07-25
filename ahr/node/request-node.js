@@ -4,15 +4,15 @@
 
   require('bufferjs');
 
-  var nodeFileClient = require('./node-file-client')
-    , nodeHttpResponse = require('./node-response')
+  var nodeFileClient = require('./file-client-node')
+    , nodeHttpResponse = require('./response-node')
     , url = require('url')
     , http = require('http')
     , https = require('https')
-    , FormData = require('file-api').FormData
+    , FormData = require('FormData')
     , FormContent = require('./form-content').FormContent
-    , addParamsToUri = require('./uri-encoder').addParamsToUri
-    , utils = require('./utils')
+    , utils = require('ahr.utils')
+    , addParamsToUri = utils.addParamsToUri
     , parseJsonp = utils.parseJsonp
     , preset = utils.preset
     , globalHeaders

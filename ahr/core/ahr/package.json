@@ -1,0 +1,32 @@
+{
+  "name"          : "ahr2",
+  "homepage"      : "https://github.com/coolaj86/abstract-http-request",
+  "description"   : "An Abstract Http Request for Node.JS (http/https) and the Browser (XMLHttpRequeuest2). For `npm install ahr.node` for Node and `ender install ahr2` for Ender. 'ahr2'. In both cases it should be required as `var request = require('ahr2')`",
+   "repository"   : {
+                      "type": "git",
+                      "url": "git://github.com/coolaj86/abstract-http-request.git"
+                    },
+  "keywords"      : ["xhr", "ahr", "xmlhttprequest", "http", "https", "file", "browser", "xhr2", "cors", "xdm", "jsonp"],
+  "author"        : "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info)",
+  "contributors"  : [
+                      "T. Jameson Little <beatgammit@gmail.com>"
+                    ],
+  "engines"       : {
+                      "node": ">= 0.4.0"
+                    },
+  "dependencies"  : {
+                        "future": ">= 2.1.0"
+                      , "join": ">= 2.1.0"
+                      , "url": ">= 0.0.0"
+                      , "events.node": ">= 0.4.0"
+                      , "ahr.browser": ">= 2.1.0"
+                      , "ahr.options": ">= 2.1.0"
+                      , "ahr.utils": ">= 2.1.0"
+                    },
+  "lib"           : ".",
+  "directories"   : {
+                      "lib": "."
+                    },
+  "main"          : "ahr",
+  "version"       : "2.1.1"
+}

@@ -1,0 +1,27 @@
+{
+  "name"          : "ahr.options",
+  "homepage"      : "https://github.com/coolaj86/abstract-http-request",
+  "description"   : "`options` module of Abstract Http Request (AHR)",
+   "repository"   : {
+                      "type": "git",
+                      "url": "git://github.com/coolaj86/abstract-http-request.git"
+                    },
+  "keywords"      : ["ahr"],
+  "author"        : "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info)",
+  "contributors"  : [
+                      "T. Jameson Little <beatgammit@gmail.com>"
+                    ],
+  "engines"       : {
+                      "node": ">= 0.4.0"
+                    },
+  "dependencies"  : {
+                        "url": ">= 0.0.0"
+                      , "ahr.utils": ">= 0.0.0"
+                    },
+  "lib"           : ".",
+  "directories"   : {
+                      "lib": "."
+                    },
+  "main"          : "ahr.options",
+  "version"       : "2.1.0"
+}

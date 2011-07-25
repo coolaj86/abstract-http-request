@@ -5,7 +5,7 @@
   require('bufferjs');
 
   var url = require('url')
-    , utils = require('./utils')
+    , utils = require('ahr.utils')
     , parseJsonp = utils.parseJsonp
     , extend = utils.extend;
 

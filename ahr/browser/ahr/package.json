@@ -1,0 +1,25 @@
+{
+  "name"          : "ahr.browser",
+  "homepage"      : "https://github.com/coolaj86/abstract-http-request",
+  "description"   : "An Abstract Http Request for Node.JS (httpClient) and the Browser (XMLHttpRequeuest2)",
+   "repository"   : {
+                      "type": "git",
+                      "url": "git://github.com/coolaj86/abstract-http-request.git"
+                    },
+  "keywords"      : ["ahr"],
+  "author"        : "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info)",
+  "contributors"  : [
+                      "T. Jameson Little <beatgammit@gmail.com>"
+                    ],
+  "engines"       : {
+                      "node": ">= 0.4.0"
+                    },
+  "dependencies"  : {
+                      , "ahr.browser.request": ">= 2.1.0"
+                    },
+  "lib"           : ".",
+  "directories"   : {
+                      "lib": "."
+                    },
+  "version"       : "2.1.0"
+}

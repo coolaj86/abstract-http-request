@@ -1,21 +1,31 @@
 /*jslint devel: true, debug: true, es5: true, onevar: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, newcap: true, immed: true, strict: true */
+var ahrOptions = {};
 (function () {
   "use strict";
 
   var globalOptions
-    , exports = module.exports
-    , location = require('./location')
-    , FileApi = require('file-api')
-    , File = FileApi.File
-    , FileList = FileApi.FileList
-    , FormData = FileApi.FormData
     , url = require('url')
-    , uriEncoder = require('./uri-encoder')
-    , uriEncodeObject = uriEncoder.uriEncodeObject
-    , utils = require('./utils')
-    , clone = utils.clone
-    , preset = utils.preset
-    , objectToLowerCase = utils.objectToLowerCase;
+    , File = require('File')
+    , FileList = require('FileList')
+    , FormData = require('FormData')
+    , utils = require('ahr.utils')
+    , location
+    , uriEncodeObject
+    , clone
+    , preset
+    , objectToLowerCase
+    ;
+
+  try {
+    location = require('./location');
+  } catch(e) {
+    location = require('location');
+  }
+
+  uriEncodeObject = utils.uriEncodeObject;
+  clone = utils.clone;
+  preset = utils.preset;
+  objectToLowerCase = utils.objectToLowerCase;
 
   globalOptions = {
     port: 80,
@@ -41,11 +51,11 @@
   //
   // Manage global options while keeping state safe
   //
-  exports.globalOptionKeys = function () {
+  ahrOptions.globalOptionKeys = function () {
     return Object.keys(globalOptions);
   };
 
-  exports.globalOption = function (key, val) {
+  ahrOptions.globalOption = function (key, val) {
     if ('undefined' === typeof val) {
       return globalOptions[key];
     }
@@ -55,7 +65,7 @@
     globalOptions[key] = val;
   };
 
-  exports.setGlobalOptions = function (bag) {
+  ahrOptions.setGlobalOptions = function (bag) {
     Object.keys(bag).forEach(function (key) {
       globalOptions[key] = bag[key];
     });
@@ -76,6 +86,10 @@
         "Most web servers just ignore it. Please use 'query' rather than 'body'.\n" +
         "Also, you may consider filing this as a bug - please give an explanation.\n" +
         "Finally, you may allow this by passing { forceAllowBody: 'true' } ");
+    }
+    if (options.body && options.jsonp) {
+      throw new Error("The de facto standard is that 'jsonp' should not have a body (and I don't see how it could have one anyway).\n" +
+        "If you consider filing this as a bug please give an explanation.");
     }
   }
 
@@ -372,15 +386,11 @@
     }
   }
 
-  exports.handleOptions = function (options) {
+  ahrOptions.handleOptions = function (options) {
     handleUri(options);
     handleHeaders(options);
     handleBody(options);
 
     return options;
   };
-
-  module.exports = exports;
-
-  provide('ahr-options', module.exports);
 }());

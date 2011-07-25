@@ -1,11 +1,11 @@
 /*jslint devel: true, debug: true, es5: true, onevar: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, newcap: true, immed: true, strict: true */
 // This module is meant for modern browsers. Not much abstraction or 1337 majic
-var window;
 (function (undefined) {
   "use strict";
 
-  var url = require('url')
-    , browserJsonpClient = require('./browser-jsonp')
+  var url //= require('url')
+    , browserJsonpClient = require('ahr.browser.jsonp')
+    , triedHeaders = {}
     , nativeHttpClient
     , globalOptions
     , restricted
@@ -121,7 +121,7 @@ var window;
       ;
 
     function onTimeout() {
-        req.emit("timeout", {});
+      req.emit("timeout", new Error("timeout after " + options.timeout + "ms"));
     }
 
     function resetTimeout() {
@@ -130,10 +130,16 @@ var window;
     }
 
     function sanatizeHeaders(header) {
-      var value = options.headers[header];
+      var value = options.headers[header]
+        , headerLc = header.toLowerCase()
+        ;
 
+      // only warn the user once about bad headers
       if (-1 !== restricted.indexOf(header.toLowerCase())) {
-        console.log('Cannot set header ' + header + ' because it is restricted (http://www.w3.org/TR/XMLHttpRequest/#the-setrequestheader-method)');
+        if (!triedHeaders[headerLc]) {
+          console.error('Ignoring all attempts to set restricted header ' + header + '. See (http://www.w3.org/TR/XMLHttpRequest/#the-setrequestheader-method)');
+        }
+        triedHeaders[headerLc] = true;
         return;
       }
 
@@ -141,8 +147,8 @@ var window;
         // throws INVALID_STATE_ERROR if called before `open()`
         xhr2.setRequestHeader(header, value);
       } catch(e) {
-        console.log('error setting header: ' + header);
-        console.log(e);
+        console.error('error setting header: ' + header);
+        console.error(e);
       }
     }
 
@@ -262,6 +268,8 @@ var window;
 
   function send(req, res) {
     var options = req.userOptions;
+    // TODO fix this ugly hack
+    url = url || require('url');
     if (options.jsonp && options.jsonpCallback) {
       return browserJsonpClient(req, res);
     }
@@ -269,6 +277,4 @@ var window;
   }
 
   module.exports = send;
-
-  provide('browser-request', module.exports);
 }());

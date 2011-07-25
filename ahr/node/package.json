@@ -1,12 +1,12 @@
 {
-  "name"          : "ahr2",
+  "name"          : "ahr.node",
   "homepage"      : "https://github.com/coolaj86/abstract-http-request",
   "description"   : "An Abstract Http Request for Node.JS (httpClient) and the Browser (XMLHttpRequeuest2)",
    "repository"   : {
                       "type": "git",
                       "url": "git://github.com/coolaj86/abstract-http-request.git"
                     },
-  "keywords"      : ["xhr", "ahr", "xmlhttprequest", "http", "https", "file", "browser", "xhr2", "cors", "xdm", "jsonp"],
+  "keywords"      : ["ahr"],
   "author"        : "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info)",
   "contributors"  : [
                       "T. Jameson Little <beatgammit@gmail.com>"
@@ -15,15 +15,17 @@
                       "node": ">= 0.4.0"
                     },
   "dependencies"  : {
-                      "require-kiss": ">= 1.0.5",
-                      "futures": ">= 1.9.4",
-                      "bufferjs": ">= 0.0.0",
-                      "file-api": ">= 0.0.0"
+                        "ahr2": ">= 2.1.0"
+                      , "bufferjs": ">= 0.0.0"
+                      , "File": ">= 0.0.0"
+                      , "FileList": ">= 0.0.0"
+                      , "FormData": ">= 0.0.0"
+                      , "ahr.utils": ">= 0.0.0"
                     },
-  "lib"           : "lib",
+  "lib"           : ".",
   "directories"   : {
-                      "lib": "lib"
+                      "lib": "."
                     },
-  "main"          : "./lib/ahr2",
-  "version"       : "2.0.4"
+  "main"          : "request-node",
+  "version"       : "2.1.0"
 }

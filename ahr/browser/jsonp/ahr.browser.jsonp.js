@@ -18,7 +18,7 @@
       , cbkey = options.jsonpCallback
       , script = document.createElement("script")
       , head = document.getElementsByTagName("head")[0] || document.documentElement
-      , addParamsToUri = require('uri-encoder').addParamsToUri
+      , addParamsToUri = require('ahr.utils').addParamsToUri
       , timeout
       , fulfilled; // TODO move this logic elsewhere into the emitter
 
@@ -121,6 +121,4 @@
   }
 
   module.exports = browserJsonpClient;
-
-  provide('browser-jsonp', module.exports);
 }());
