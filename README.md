@@ -47,8 +47,13 @@ index.html:
 
 **Node.JS**
 
-    # The name changed from ahr2 to ahr.node to resolve dependency conflicts with ender.js.
+    # WARNING: due to cross-engine dependency mismatching, the dependencies are screwy for now. Sorry. :-(
     npm install ahr.node
+    mv node_modules/ahr.node/node_modules/* node_modules/
+
+    # or
+    npm install ahr2 File FileList FormData ahr.node
+
 
 example.js:
 
