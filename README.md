@@ -34,23 +34,30 @@ Upcoming Features:
 Installation
 ====
 
-**Browser**
+**Browser w/Ender.JS**
 
-  With Ender.JS (npm-based browser package management):
-
-    # TODO this has not been added to ender yet
     ender add ahr2
+
+index.html:
+
     <script src="ender.min.js"></script>
-
-  Standalone:
-
-    git submodule init && git submodule update
-    ./mkahr.sh
-    <script src="ahr2.all.js"></script>
+    <script>
+      var request = require('ahr2');
+    </script>
 
 **Node.JS**
 
-    npm install ahr2
+    # WARNING: due to cross-engine dependency mismatching, the dependencies are screwy for now. Sorry. :-(
+    npm install ahr.node
+    mv node_modules/ahr.node/node_modules/* node_modules/
+
+    # or
+    npm install ahr2 File FileList FormData ahr.node
+
+
+example.js:
+
+    var request = require('ahr2');
 
 Usage
 ====
