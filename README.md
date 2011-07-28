@@ -1,7 +1,10 @@
 AbstractHttpRequest
 ====
 
-Note: The version 2.0 API may change, but should stabalize by 2.1.0
+Installation
+---
+
+Note: The version 2.0 API may change, but should stabalize by 2.3.0
 
 Abstract HTTP Request is a lightweight HTTP Client for both **Node.JS** as well as **Modern Browsers** which handles:
 
@@ -34,9 +37,24 @@ Upcoming Features:
 Installation
 ====
 
+**Node.JS**
+
+    npm install ahr2 File FileList FormData location navigator ahr.node
+
+    # or
+
+    npm install ahr.node
+    mv node_modules/ahr.node/node_modules/* node_modules/
+
+WARNING: due to cross-engine dependency mismatching, the dependencies are screwy for now. Sorry.
+:-(
+
 **Browser w/Ender.JS**
 
     ender add ahr2
+
+
+**require**
 
 index.html:
 
@@ -44,15 +62,6 @@ index.html:
     <script>
       var request = require('ahr2');
     </script>
-
-**Node.JS**
-
-    # WARNING: due to cross-engine dependency mismatching, the dependencies are screwy for now. Sorry. :-(
-    npm install ahr.node
-    mv node_modules/ahr.node/node_modules/* node_modules/
-
-    # or
-    npm install ahr2 File FileList FormData ahr.node
 
 
 example.js:
