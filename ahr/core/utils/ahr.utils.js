@@ -112,7 +112,7 @@
       uri = uri.substr(0, anchorpos);
     }
 
-    query = uriEncodeObject(params);
+    query = utils.uriEncodeObject(params);
 
     // cut the leading '&' if no other params have been written
     if (query.length > 0) {

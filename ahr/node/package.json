@@ -21,6 +21,8 @@
                       , "FileList": ">= 0.0.0"
                       , "FormData": ">= 0.0.0"
                       , "ahr.utils": ">= 0.0.0"
+                      , "navigator": ">= 0.0.0"
+                      , "location": ">= 0.0.0"
                     },
   "lib"           : ".",
   "directories"   : {

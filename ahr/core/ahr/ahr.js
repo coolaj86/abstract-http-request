@@ -103,9 +103,6 @@
 
     options.href = options.href || options.url;
 
-    if (options.jsonp) {
-      options.query = preset(query || {}, options.query || {});
-    }
     ahrOptions.handleOptions(options);
 
     // todo throw all the important properties in the request
@@ -151,12 +148,12 @@
   function allRequests(method, href, query, body, jsonp, options, callback) {
     options = options || {};
 
-    options.method = method;
-    options.href = href || "";
-    options.jsonp = jsonp;
+    if (method) { options.method = method; }
+    if (href) { options.href = href; }
+    if (jsonp) { options.jsonp = jsonp; }
 
-    options.query = preset((query || {}), (options.query || {}));
-    options.body = body;
+    if (query) { options.query = preset((query || {}), (options.query || {})) }
+    if (body) { options.body = body; }
 
     return ahr(options, callback);
   }
