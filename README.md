@@ -39,7 +39,7 @@ Installation
 
 **Node.JS**
 
-    npm install ahr2 File FileList FormData location navigator ahr.node
+    npm install ahr2 File FileList FormData location navigator ahr.node atob
 
     # or
 
