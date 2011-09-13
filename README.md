@@ -39,7 +39,7 @@ Installation
 
 **Node.JS**
 
-    npm install ahr2 File FileList FormData location navigator ahr.node atob
+    npm install ahr2 File FileList FormData location navigator ahr.node atob btoa
 
     # or
 
@@ -51,8 +51,15 @@ WARNING: due to cross-engine dependency mismatching, the dependencies are screwy
 
 **Browser w/Ender.JS**
 
-    ender add ahr2
+    ender build ahr2
 
+Note: If you're supporting legacy browsers you'll need the `es5` and `JSON` modules (you may also need to create fake functions for FormData, File, and FileList)..
+
+    ender build es5 JSON ahr2
+
+    window.FormData = window.FormData || function () {};
+    window.File = window.File || function () {};
+    window.FileList = window.FileList || function () {};
 
 **require**
 
@@ -68,8 +75,67 @@ example.js:
 
     var request = require('ahr2');
 
-Usage
+Basic Usage
 ====
+
+    var request = require('ahr2') // Ender.JS providers `require` for browser
+      ;
+
+    // use HREF
+    request({
+        href: "/"
+    }).when(function (err, ahr, data) {
+      console.log(arguments);
+    });
+
+    // use other stuff
+    request({
+        method: 'GET'
+      , hostname: "foobar3000.com"
+      , port: 80
+      , pathname: "/echo"
+      , query: {
+            foo: "bar"
+          , baz: ["qux, quux"]
+          , corge: ""
+        }
+    }).when(function (err, ahr, data) {
+      console.log(arguments);
+    });
+
+GET, HEAD, OPTIONS, DELETE Shorthand
+---
+
+    // request.get(resource, query, [options]);
+    request.get("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000});
+    request.head("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000});
+    request.options("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000});
+    request.delete("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000});
+
+POST, PUT Shorthand
+---
+
+    // request.post(resource, query, body, options);
+    request.post("/resource", {}, body, [options]);
+    request.put("/resource", {}, body, [options]);
+
+FileApi / File / FileList / FormData Upload
+---
+
+  see options.body section below
+
+JSONP Shorthand
+---
+
+Note: Yes, This does work in Node.JS and the Browser.
+
+    // request.jsonp(resource, jsonp, query, [options])
+    var flickrApi = "http://api.flickr.com/services/feeds/photos_public.gne?format=json";
+    request.jsonp(flickrApi, "jsoncallback", {tags: "cat", tagmode: "any"})
+      .when(function (err, response, data) {
+        console.log(data) // t3h kittehz!
+      });
+
 
 AHR2 uses *both* EventEmitter and FuturesJS in *both* the browser and Node.JS.
 
@@ -187,7 +253,7 @@ options.body and options.encodedBody
 `options.body` is expected to be a JavaScript or FormData Object.
 
 
-JavaScript Object:
+**JavaScript Object**:
 
     "body": {
         "name": "Alfred"
@@ -198,7 +264,7 @@ JavaScript Object:
   * `Content-Type` will be `x-www-form-urlencoded`
   * encoded result will be `name=Alfred&address=Canada&fav_color=green`
 
-JavaScript with File, FileList
+**File, FileList**:
 
     "body": {
         "name": "Alfred"
@@ -210,7 +276,7 @@ JavaScript with File, FileList
   * `Content-Type` will be `multipart/form-data`
   * encoded result will default to `Content-Length`-based (not `chunked`)
 
-**FormData Object**
+**FormData Object**:
 
     "body": [object FormData]
 
@@ -219,54 +285,27 @@ JavaScript with File, FileList
 
 If you have some sort of special encoding, format `options.encodedBody` yourself and set options.headers['Content-Type'] yourself.
 
-Shorthand:
-----
-
-`http`, `https`, `head`, `get`, `post`, `put`, `delete`, `options`, `jsonp`, `join`
-
-GET, HEAD, OPTIONS, DELETE
-
-    // request.get(resource, query, [options]);
-    request.get("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000});
-    request.head("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000});
-    request.options("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000});
-    request.delete("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000});
-
-POST, PUT
-
-    // request.post(resource, query, body, options);
-    request.post("/resource", {}, body, [options]);
-    request.put("/resource", {}, body, [options]);
-
-JSONP
-
-    // request.jsonp(resource, jsonp, query, [options])
-    var flickrApi = "http://api.flickr.com/services/feeds/photos_public.gne?format=json";
-    request.jsonp(flickApi, "jsoncallback", {tags: "cat", tagmode: "any"})
-      .when(function (err, response, data) {
-        console.log(data) // t3h kittehz!
-      });
-
-HTTP, HTTPs
-
-    request.http(options);
-    request.https(options);
-
 Joining Requests
+===
 
-    // request.join(req1, req2, req3, ...);
-    request.join(
-      request(options),
-      request.get("/local-contacts"),
-      request.jsonp(FacebookContacts, "jsoncallback"),
-      request.jsonp(TwitterContacts, "callback")
-    ).when(function (fbcResp, tcResp) {
-      var fbc, tc;
-      fbc = { err: fbcResp[0], response: fbcResp[1], data: fbcResp[2] };
-      tc = { err: tcResp[0], response: tcResp[1], data: tcResp[2] };
-      if (fbc.err || tc.err) {
-        console.log(fbc.err);
-        console.log(tc.err);
+    // npm install join
+    // or ender build join
+
+    var Join = require('join')
+      , join = Join()
+      ;
+
+    // join(req1, req2, req3, ...);
+    join(
+      request({ "href": "/foo" }),
+      request.get("/bar"),
+    ).when(function (fooArgs, barArgs) {
+      var fArgs, bArgs;
+      fArgs = { err: fooArgs[0], response: fooArgs[1], data: fooArgs[2] };
+      bArgs = { err: barArgs[0], response: barArgs[1], data: barArgs[2] };
+      if (fArgs.err || bArgs.err) {
+        console.log(fArgs.err);
+        console.log(bArgs.err);
       }
     });
 
