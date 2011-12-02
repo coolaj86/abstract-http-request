@@ -17,6 +17,7 @@
   "dependencies"  : {
                         "url": ">= 0.0.0"
                       , "ahr.utils": ">= 0.0.0"
+                      , "atob": "1.0.x"
                     },
   "lib"           : ".",
   "directories"   : {
