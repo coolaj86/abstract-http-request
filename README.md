@@ -37,16 +37,9 @@ Upcoming Features:
 Installation
 ====
 
-**Node.JS**
-
-    npm install ahr2 File FileList FormData location navigator ahr.node atob btoa
-
-    # or
+**NodeJS**
 
     npm install ahr2
-
-WARNING: due to cross-engine dependency mismatching, the dependencies are screwy for now. Sorry.
-:-(
 
 **Browser w/ Pakmanager**
 

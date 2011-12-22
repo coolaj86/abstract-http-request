@@ -5,7 +5,7 @@
 
   var assert = require('assert')
     , sequence = require('sequence')()
-    , mockHostName = 'foobar3000.com'
+    , mockHostName = 'cors.foobar3000.com'
     , mockHostPort = '3273'
     , mockHost = mockHostName + (mockHostPort ? ':' + mockHostPort : '')
     , request
@@ -47,7 +47,7 @@
 
   function hrefHost(next) {
     // curl "http://localhost:8000"
-    var href = "http://" + mockHost + "/echo.json?cors=true"
+    var href = "http://" + mockHost + "/echo.json"
       ;
 
     request(
@@ -75,7 +75,7 @@
 
   function hrefHostPathQuery(next) {
     // curl "http://localhost:8000?foo=bar&baz=qux&baz=quux&corge"
-    var href = "http://" + mockHost + "/echo.json?cors=true&foo=bar&baz=qux&baz=quux&corge"
+    var href = "http://" + mockHost + "/echo.json?foo=bar&baz=qux&baz=quux&corge"
       ;
 
     request(
@@ -103,7 +103,7 @@
 
   function paramsHrefBody(next) {
     // curl "http://localhost:8000?foo=bar&baz=qux&baz=quux&corge" -d ''
-    var href = "http://" + mockHost + "/echo.json?cors=true&foo=bar&baz=qux&baz=quux&corge"
+    var href = "http://" + mockHost + "/echo.json?foo=bar&baz=qux&baz=quux&corge"
       , body = {
             "grault": "garply"
           , "waldo": [
