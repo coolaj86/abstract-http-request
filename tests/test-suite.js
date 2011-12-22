@@ -3,13 +3,21 @@
 
   // TODO an assert that calls next
 
-  var request = require('../lib') //('ahr2')
-    , assert = require('assert')
+  var assert = require('assert')
     , sequence = require('sequence')()
     , mockHostName = 'foobar3000.com'
-    , mockHostPort = '3223'
+    , mockHostPort = '3273'
     , mockHost = mockHostName + (mockHostPort ? ':' + mockHostPort : '')
+    , request
     ;
+
+  try {
+    request = require('ahr2');
+    console.log('testing from npm');
+  } catch(e) {
+    request = require('../lib');
+    console.log('testing from ../lib');
+  }
 
   function assertDeepAlike(a, b, key) {
     var alike = true
@@ -39,7 +47,7 @@
 
   function hrefHost(next) {
     // curl "http://localhost:8000"
-    var href = "http://" + mockHost + "/echo.json"
+    var href = "http://" + mockHost + "/echo.json?cors=true"
       ;
 
     request(
@@ -67,7 +75,7 @@
 
   function hrefHostPathQuery(next) {
     // curl "http://localhost:8000?foo=bar&baz=qux&baz=quux&corge"
-    var href = "http://" + mockHost + "/echo.json?foo=bar&baz=qux&baz=quux&corge"
+    var href = "http://" + mockHost + "/echo.json?cors=true&foo=bar&baz=qux&baz=quux&corge"
       ;
 
     request(
@@ -95,7 +103,7 @@
 
   function paramsHrefBody(next) {
     // curl "http://localhost:8000?foo=bar&baz=qux&baz=quux&corge" -d ''
-    var href = "http://" + mockHost + "/echo.json?foo=bar&baz=qux&baz=quux&corge"
+    var href = "http://" + mockHost + "/echo.json?cors=true&foo=bar&baz=qux&baz=quux&corge"
       , body = {
             "grault": "garply"
           , "waldo": [
