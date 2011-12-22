@@ -43,19 +43,25 @@ Installation
 
     # or
 
-    npm install ahr.node
-    mv node_modules/ahr.node/node_modules/* node_modules/
+    npm install ahr2
 
 WARNING: due to cross-engine dependency mismatching, the dependencies are screwy for now. Sorry.
 :-(
 
-**Browser w/Ender.JS**
+**Browser w/ Pakmanager**
 
-    ender build ahr2
+    pakmanager build
 
-Note: If you're supporting legacy browsers you'll need the `es5` and `JSON` modules (you may also need to create fake functions for FormData, File, and FileList)..
+Note: If you're supporting legacy browsers you'll need to include the `es5` and `JSON` modules in `package.json` (you may also need to create fake functions for FormData, File, and FileList)..
 
-    ender build es5 JSON ahr2
+package.json:
+
+    browserDependencies: {
+        "es5"
+      , "JSON"
+    }
+
+index.js:
 
     window.FormData = window.FormData || function () {};
     window.File = window.File || function () {};

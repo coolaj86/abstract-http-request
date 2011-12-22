@@ -3,25 +3,35 @@
 
   // TODO an assert that calls next
 
-  var request = require('ahr2')
+  var request = require('../lib') //('ahr2')
     , assert = require('assert')
     , sequence = require('sequence')()
+    , mockHostName = 'foobar3000.com'
+    , mockHostPort = '3223'
+    , mockHost = mockHostName + (mockHostPort ? ':' + mockHostPort : '')
     ;
 
-  function assertDeepAlike(a, b) {
+  function assertDeepAlike(a, b, key) {
     var alike = true
       , res;
 
     if ('object' !== typeof a) {
-      res = a === b;
+      res = (a === b);
       if (!res) {
-        console.log('dissimilar:', a, b);
+        console.error('dissimilar:', key, a, b);
       }
-      return a === b;
+      return res;
+    }
+
+    if ('object' !== typeof b) {
+      console.error('type mismatch');
+      console.info(a);
+      console.info(b);
+      return false;
     }
 
     Object.keys(a).forEach(function (key) {
-      alike = alike && assertDeepAlike(a[key], b[key]);
+      alike = alike && assertDeepAlike(a[key], b[key], key);
     });
 
     return alike;
@@ -29,21 +39,26 @@
 
   function hrefHost(next) {
     // curl "http://localhost:8000"
-    var href = "http://localhost:8000"
+    var href = "http://" + mockHost + "/echo.json"
       ;
 
     request(
         href
       , function (err, ahr, data) {
-          assert.ok(!err);
-          assert.ok(assertDeepAlike({
-              "pathname": "/"
+          var mockObj
+            ;
+
+          mockObj = {
+              "pathname": "/echo.json"
             , "method": "GET"
             , "headers": {
-                  "host": "localhost:8000"
+                  "host": mockHost
               }
             , "trailers": {}
-          }, data));
+          };
+
+          assert.ok(!err);
+          assert.ok(assertDeepAlike(mockObj, data));
 
           next();
         }
@@ -52,7 +67,7 @@
 
   function hrefHostPathQuery(next) {
     // curl "http://localhost:8000?foo=bar&baz=qux&baz=quux&corge"
-    var href = "http://localhost:8000?foo=bar&baz=qux&baz=quux&corge"
+    var href = "http://" + mockHost + "/echo.json?foo=bar&baz=qux&baz=quux&corge"
       ;
 
     request(
@@ -67,10 +82,10 @@
                   ]
                 , "corge": ""
               }
-            , "pathname": "/"
+            , "pathname": "/echo.json"
             , "method": "GET"
             , "headers": {
-                  "host": "localhost:8000"
+                  "host": mockHost
               }
           }, data));
           next();
@@ -80,7 +95,7 @@
 
   function paramsHrefBody(next) {
     // curl "http://localhost:8000?foo=bar&baz=qux&baz=quux&corge" -d ''
-    var href = "http://localhost:8000?foo=bar&baz=qux&baz=quux&corge"
+    var href = "http://" + mockHost + "/echo.json?foo=bar&baz=qux&baz=quux&corge"
       , body = {
             "grault": "garply"
           , "waldo": [
@@ -98,7 +113,10 @@
           , body: body
         }
       , function (err, ahr, data) {
-          assert.ok(assertDeepAlike({
+          var mockObj
+            ;
+
+          mockObj = {
               "query": {
                   "foo": "bar"
                 , "baz": [
@@ -116,14 +134,16 @@
                   ]
                 , "thud": ""
               }
-            , "pathname": "/"
+            , "pathname": "/echo.json"
             , "method": "POST"
             , "headers": {
-                  "host": "localhost:8000"
+                  "host": mockHost
                 , "content-type": "application/json"
               //, "content-type": "application/x-www-form-urlencoded"
               }
-          }, data));
+          };
+
+          assert.ok(assertDeepAlike(mockObj, data));
           next();
         }
     );
@@ -139,8 +159,8 @@
             */
             protocol: "http:"
           //, host: "localhost:8000"
-          , hostname: "localhost"
-          , port: "8000"
+          , hostname: mockHostName
+          , port: mockHostPort
           , pathname: "/doesntexist"
           , query: {
                 "foo": "bar"
@@ -156,7 +176,10 @@
     request(
         params
       , function (err, ahr, data) {
-          assert.ok(assertDeepAlike({
+          var mockObj
+            ;
+          
+          mockObj = {
               "query": {
                   "foo": "bar"
                 , "baz": [
@@ -168,9 +191,11 @@
             , "pathname": "/doesntexist"
             , "method": "GET"
             , "headers": {
-                  "host": "localhost:8000"
+                  "host": mockHost
               }
-          }, data));
+          };
+
+          assert.ok(assertDeepAlike(mockObj, data));
           next();
         }
     );
@@ -189,7 +214,7 @@
   // TODO merge href / query
     //.then(paramsHrefQueryMerge)
     .then(function () {
-      console.log('[PASS] all tests passed');
+      console.info('[PASS] all tests passed');
     });
     ;
 

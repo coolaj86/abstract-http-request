@@ -1,5 +1,7 @@
 Good test coverage using foobar3000.
 
+  * Test and Simplify URL string and object parsing / creation
+
   * contentType - json, application/json, jsonp
   * responseType
     * xhr2.overrideMimeType("text/plain; charset=x-user-defined");
