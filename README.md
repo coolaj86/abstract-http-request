@@ -4,9 +4,7 @@ AbstractHttpRequest
 Installation
 ---
 
-Note: The version 2.0 API may change, but should stabalize by 2.3.0
-
-Abstract HTTP Request is a lightweight HTTP Client for both **Node.JS** as well as **Modern Browsers** which handles:
+Abstract HTTP Request is an HTTP Client for both **Node.JS** as well as **Modern Browsers** which handles:
 
   * JSONP
   * Cross-Origin Resource Sharing (CORS)
@@ -28,11 +26,8 @@ Supported Platforms:
   * Chrome 9+
   * Firefox 4+
   * IE 9+
-
-Upcoming Features:
-
-  * Better support for binary uploads in browser
-  * Blob, BlobBuilder, etc (not yet implemented in most browsers)
+  * Android Browser 2.2 (which lacks FormData support)
+  * iOS 5 Mobile Safari
 
 Installation
 ====
@@ -64,7 +59,7 @@ index.js:
 
 index.html:
 
-    <script src="ender.min.js"></script>
+    <script src="pakmanager.min.js"></script>
     <script>
       var request = require('ahr2');
     </script>
