@@ -11,3 +11,6 @@ Good test coverage using foobar3000.
     * FileList
     * FormData
     * BlobBuilder
+
+  * Better support for binary uploads in browser
+  * Blob, BlobBuilder, etc (not yet implemented in most browsers)
