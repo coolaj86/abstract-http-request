@@ -26,7 +26,7 @@
   , "dependencies": {
         "future": ">= 2.1.0"
       , "join": ">= 2.1.0"
-      , "atob": "1.0.x"
+      , "btoa": "1.x"
       , "bufferjs": "1.0.x"
       , "File": ">= 0.0.0"
       , "FileList": ">= 0.0.0"
