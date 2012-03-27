@@ -12,11 +12,11 @@
     ;
 
   try {
-    request = require('ahr2');
-    console.log('testing from npm');
-  } catch(e) {
     request = require('../lib');
     console.log('testing from ../lib');
+  } catch(e) {
+    request = require('ahr2');
+    console.log('testing from npm');
   }
 
   function assertDeepAlike(a, b, key) {
@@ -209,6 +209,24 @@
     );
   }
 
+  function hrefAndQuery(next) {
+    request.get('http://foobar3000.com/echo', { foo: 'bar' }).when(function (err, ahr, data) {
+      assert.ok('http://foobar3000.com/echo?foo=bar' === data.href, 'unexpected href');
+      assert.ok('bar' === data.query.foo, 'foo !== bar');
+      assert.ok(1 === Object.keys(data.query).length, 'too many query items');
+      next();
+    });
+  }
+
+  function hrefAndDoubleQuery(next) {
+    request.get('http://foobar3000.com/echo?baz=corge', { foo: 'bar' }).when(function (err, ahr, data) {
+      assert.ok('bar' === data.query.foo, 'foo !== bar');
+      assert.ok('corge' === data.query.baz, 'baz !== corge');
+      assert.ok(2 === Object.keys(data.query).length, 'too few query items');
+      next();
+    });
+  }
+
   function paramsPartial(next) {
   }
 
@@ -218,6 +236,8 @@
     .then(hrefHostPathQuery)
     .then(paramsHrefBody)
     .then(paramsFull)
+    .then(hrefAndQuery)
+    .then(hrefAndDoubleQuery)
     //.then(paramsPartial)
   // TODO merge href / query
     //.then(paramsHrefQueryMerge)
