@@ -1,7 +1,7 @@
 {
   "name": "ahr2",
   "main": "index",
-  "version": "2.3.0",
+  "version": "2.3.2",
   "homepage": "https://github.com/coolaj86/abstract-http-request",
   "description": "An Abstract Http Request for Node.JS (http/https) and the Browser (XMLHttpRequeuest2). For `npm install ahr2` for Node and `pakmanager build` for Ender / Pakmanager. It should be required as `var request = require('ahr2')`",
   "repository": {
@@ -21,9 +21,16 @@
     "xdm",
     "jsonp"
   ],
-  "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info)",
+  "author": {
+    "name": "AJ ONeal",
+    "email": "coolaj86@gmail.com",
+    "url": "http://coolaj86.info"
+  },
   "contributors": [
-    "T. Jameson Little <beatgammit@gmail.com>"
+    {
+      "name": "T. Jameson Little",
+      "email": "beatgammit@gmail.com"
+    }
   ],
   "engines": {
     "node": ">= 0.4.0"
@@ -49,5 +56,7 @@
   "lib": ".",
   "directories": {
     "lib": "."
-  }
+  },
+  "devDependencies": {},
+  "optionalDependencies": {}
 }
