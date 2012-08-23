@@ -1,55 +1,148 @@
+[![build status](https://secure.travis-ci.org/coolaj86/abstract-http-request.png)](http://travis-ci.org/coolaj86/abstract-http-request)
 AbstractHttpRequest
 ====
 
-Abstract HTTP Request is a lightweight HTTP Client with **very reasonable default settings** that works both in **Browers** and **SSJS**.
+Installation
+---
 
-In provides a thin abstraction layer over the underlaying http client (XMLHttpRequest or Http.Client.Request.Response)
+Abstract HTTP Request is an HTTP Client for both **Node.JS** as well as **Modern Browsers** which handles:
 
-Currently the following are supported:
+  * JSONP
+  * Cross-Origin Resource Sharing (CORS)
+    * Access-Control (AC) + XMLHttpRequest Level 2 (XHR2)
+    * XDomainRequest (XDR)
+  * Binary downloads (overrideMimeType hack)
+  * HTML5 FileApi
+    * Binary uploads
+    * FormData
+    * File
+    * FileList
+  * Automatically redirects on 3xx requests (excluding 304)
+  * HTTP Basic Auth
+  * Join multiple requests together (see the **shorthand** section below)
 
-  * Browsers (jQuery / XHR backend) - jQuery dependency to be removed soon
-    * JSONP by script tag injection
-    * XHR Level 1 requests
-    * Lightweight standalone Abstraction of XHR
-    * If jQuery is detected, uses jQuery instead
+Supported Platforms:
 
-  * Node.js (Http.Client, auto-redirects on 3xx responses)
-    * **API-compatible with [`node-request`](http://github.com/mikeal/node-utils/tree/master/request/)**
-      * Passes `node-request` tests. Any break from `node-request`'s documented API should be filed as bug
-    * JSONP via http Client
-    * Automatically redirects on 3xx requests (excluding 304)
-    * Automatically handles base64 encoding of HTTP Basic Authentication
+  * Node.JS v0.4.2+
+  * Chrome 9+
+  * Firefox 4+
+  * IE 9+
+  * Android Browser 2.2 (which lacks FormData support)
+  * iOS 5 Mobile Safari
 
-Goals
-----
-
-  * XHR2 / CORS support, (with option plugin for post form / iframe tricks)
-  * Echo server to test browser requests against
-  * Abstract response object
-  * methodOverride
-
-Installation & Basic Usage
+Installation
 ====
 
-Browser:
+**NodeJS**
 
-    <script src="ahr.all.js"></script>
-    // Has a super-simple `require` wrapper for convenience
-    // ahr is not put into the global namespace by default
-    var request = require('ahr');
+    npm install ahr2
 
-Node.JS:
+**Browser w/ Pakmanager**
 
-    npm install ahr
-    var request = require('ahr');
+    pakmanager build
 
-Usage:
-----
+Note: If you're supporting legacy browsers you'll need to include the `es5` and `JSON` modules in `package.json` (you may also need to create fake functions for FormData, File, and FileList)..
+
+package.json:
+
+    browserDependencies: {
+        "es5"
+      , "JSON"
+    }
+
+index.js:
+
+    window.FormData = window.FormData || function () {};
+    window.File = window.File || function () {};
+    window.FileList = window.FileList || function () {};
+
+**require**
+
+index.html:
+
+    <script src="pakmanager.min.js"></script>
+    <script>
+      var request = require('ahr2');
+    </script>
+
+
+example.js:
+
+    var request = require('ahr2');
+
+Basic Usage
+====
+
+    var request = require('ahr2') // Ender.JS providers `require` for browser
+      ;
+
+    // use HREF
+    request({
+        href: "/"
+    }).when(function (err, ahr, data) {
+      console.log(arguments);
+    });
+
+    // use other stuff
+    request({
+        method: 'GET'
+      , hostname: "foobar3000.com"
+      , port: 80
+      , pathname: "/echo"
+      , query: {
+            foo: "bar"
+          , baz: ["qux, quux"]
+          , corge: ""
+        }
+    }).when(function (err, ahr, data) {
+      console.log(arguments);
+    });
+
+GET, HEAD, OPTIONS, DELETE Shorthand
+---
+
+    // request.get(resource, query, [options]);
+    request.get("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000});
+    request.head("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000});
+    request.options("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000});
+    request.delete("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000});
+
+POST, PUT Shorthand
+---
+
+    // request.post(resource, query, body, options);
+    request.post("/resource", {}, body, [options]);
+    request.put("/resource", {}, body, [options]);
+
+FileApi / File / FileList / FormData Upload
+---
+
+  see options.body section below
+
+JSONP Shorthand
+---
+
+Note: Yes, This does work in Node.JS and the Browser.
+
+    // request.jsonp(resource, jsonp, query, [options])
+    var flickrApi = "http://api.flickr.com/services/feeds/photos_public.gne?format=json";
+    request.jsonp(flickrApi, "jsoncallback", {tags: "cat", tagmode: "any"})
+      .when(function (err, response, data) {
+        console.log(data) // t3h kittehz!
+      });
+
+
+AHR2 uses *both* EventEmitter and FuturesJS in *both* the browser and Node.JS.
+
+You may use whichever syntax you find most convenient or appropriate.
+
+    var request = require('ahr2'); // Yes, you must use `require` even in the browser
 
 Futures-style multi-callbacks
 
-    request(options)
-      .when(function (err, Xhr_Or_NodeResponse, data) {
+    var future = request(options);
+
+    future.when(function (err, response, data) {
         if (err) {
           // handle error
         }
@@ -60,159 +153,154 @@ Futures-style multi-callbacks
 
 Node-style callback
 
-    // request(options, callback);
-    request(options, function (err, Xhr_Or_NodeResponse) {
-      if (err) {
+    // request(options);
+    var res = request(options)
+      , req = res.upload
+      ;
+
+    req.on('progress', function (ev) {
+      // update UI
+    });
+
+    res.on('loadend', function (ev) {
+      if (ev.error) {
         // handle error
+        throw ev.error;
       }
       // handle data
+      console.log(ev.target.result);
     });
 
-jQuery-like shorthand (both styles of callbacks supported)
-
-GET
-    // request.get(resource, params, options)
-    request.get("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000})
-      .when(function (err, Xhr_Or_NodeResponse, data) {
-        console.log(err);
-        console.log(data);
-      });
-
-POST
-    // request.post(resource, params, body, options)
-    request.post("/resource", {}, body, options)
-
-JSONP
-    // request.jsonp(resource, jsonp, params, options)
-    request.jsonp("/resource", "jsonpcallback", {foo: "bar", baz: "gizmo"}, {timeout: 10000})
-      .when(function (err, Xhr_Or_NodeResponse, data) {
-        console.log(err);
-        console.log(data);
-      });
-
-Joining Requests
-
-    // request.join(req1, req2, req3, ...);
-    request.join(
-      request(options),
-      request.get("/local-contacts"),
-      request.jsonp(FacebookContacts, "jsoncallback"),
-      request.jsonp(TwitterContacts, "callback")
-    ).when(function (fbcResp, tcResp) {
-      var fbc, tc;
-      fbc = { err: fbcResp[0], xhr: fbcResp[1], data: fbcResp[2] };
-      tc = { err: tcResp[0], xhr: tcResp[1], data: tcResp[2] };
-      if (fbc.err || tc.err) {
-        console.log(fbc.err);
-        console.log(tc.err);
-      }
-    });
-
-
-API & Advanced Usage
+Events
 ====
 
-`http`, `https`, `head`, `get`, `post`, `put`, `delete`, `options`, `jsonp`, `join`
+Both `requests` and `responses` have all of the following events.
 
-Note: might change `delete` to `del` if `es3` keyword `delete` causes conflict. Not yet tested.
+The order of events has been normalized such that they are predictable and consistent.
 
-Note: anywhere that `options` used you may use the `uri` string instead
+`request` events will always be fired and will always reach `loadend` before `response` events begin with `loadstart`
 
-AHR.http(options, *[callback]*);
+Proper Events:
+
+  * `loadstart` - fired when the request is made
+  * `progress` - fired occasionally
+  * `load` - fires on success
+  * `loadend` - fires on completion (including after `load`, `error`, `timeout`, or `abort`)
+
+Error Events
+  * `abort` - user abort completed
+  * `timeout` - user or default timeout completed
+  * `error` - network or other error (not including >= 400 status codes)
+
+The final `loadend` is followed by the completion of all `when` promises
+
+Options
+====
+
+
+Note: anywhere that `options` used you may use the `href` string instead
+
+options
 ----
 
-Pass in a bunch of options, get back a promise for `err`, `data`, and the `nativeHttpClient` (either `XHR` or `Node.HCRR`)
-
-    AHR.http({
-      "uri": "http://user:pass@host.com:8080/p/a/t/h?query=string#hash", // parsed by node.url or jQuery
-    }).when(function (err, [XMLHttpRequest | node.Http.Client.Request.Response], data));
-
-Default Options
-----
-
-Loosely modeled after [Node's Http.Client and URL API]("http://nodejs.org/api.html")
+Loosely modeled after the [Node.JS Http.Client and URL API]("http://nodejs.org/api.html")
 
     var presets = {
-      // Overrides Connection and Request params
-      "uri": "",
+          // Overrides Connection and Request query
+          "href": ""
 
-      // Connection Params
-      "protocol": "http" | "https",
-      "ssl": false | true,
-      "port": 80 | 443,
+          // Connection Params
+        , "protocol": "http" | "https"
+        , "ssl": false | true
+        , "port": 80 | 443
+        , "query": { "search": "keys" }
 
-      // Request Params
-      "method": "GET",
-      "auth": undefined, // in the format "username:password"
-      "headers": {
-        "User-Agent": YOUR-BROWSER-UA | "Node.js (AbstractHttpRequest)",
-        "Accept": "application/json; charset=utf-8, */*; q=0.5", // prefer json utf-8, accept anything
-        "Content-Type": undefined,
-        "Content-Length": this.encodedBody.length,
-        "Transfer-Encoding": undefined
-      },
-      "body": undefined,
-      "encodedBody": undefined,
-      "attachments": undefined, // for multi-part forms; TODO
+          // Request Params
+        , "method": "GET"
+        , "auth": undefined        // in the format "username:password"
+        , "headers": {}            // see section below
+        , "body": undefined        // see section below
+        , "encodedBody": undefined // if you encode the body yourself 
 
-      // Timeout after 20 seconds
-      "timeout": 20000,
+          // Response Params
+        , "responseEncoder": function (responseText) { return Custom.parse(responseText) } // a function to parse / encode data
 
-      // get the xhr or http.request object immediately and do something with it 
-      // before the response is received
-      "syncback": function () {},
-
-      // if jQuery is present
-      "jQopts": {} // these options are passed to jQuery directly, overriding the defaults
+          // Timeout after 20 seconds
+        , "timeout": 20000
     }
 
-When options.body exists the default `Content-Type` will be `x-www-form-urlencoded`;
-
-
-Note: In the browser jQuery is currently used. This dependency will go away shortly, I just wanted it up quickly
-
-AHR. | head | get | delete | options | (uri, params, options)
+options.headers
 ----
 
-    AHR.get("/resource", {foo: "bar", baz: "gizmo"}, {timeout: 10000})
-      .when(function (err, Xhr_Or_NodeResponse, data) {
-        console.log(err);
-        console.log(data);
-      });
+    var presets = {
+      "headers": {
+          "User-Agent": YOUR-BROWSER-UA | "Node.js (AbstractHttpRequest v2.0)"
+        , "Accept": "application/json; charset=utf-8, */*; q=0.5" // prefer json utf-8, accept anything
+        , "Content-Type": undefined
+        , "Content-Length": this.encodedBody.length
+        , "Transfer-Encoding": undefined
+      },
+    };
 
-AHR | post | put | (uri, params, body, options)
+options.body and options.encodedBody
 ----
 
-When `options.body` exists the default `Content-Type` will be `x-www-form-urlencoded`;
+`options.body` is expected to be a JavaScript or FormData Object.
+
+
+**JavaScript Object**:
+
+    "body": {
+        "name": "Alfred"
+      , "address": "Canada"
+      , "fav_color": "green"
+    }
+
+  * `Content-Type` will be `x-www-form-urlencoded`
+  * encoded result will be `name=Alfred&address=Canada&fav_color=green`
+
+**File, FileList**:
+
+    "body": {
+        "name": "Alfred"
+      , "profile_pic": [object File]
+      , "comment": "Me at the beach"
+      , "album_pics": [object FileList]
+    }
+
+  * `Content-Type` will be `multipart/form-data`
+  * encoded result will default to `Content-Length`-based (not `chunked`)
+
+**FormData Object**:
+
+    "body": [object FormData]
+
+  * `Content-Type` will be `multipart/form-data`
+  * encoded result will default to `Content-Length`-based (not `chunked`)
 
 If you have some sort of special encoding, format `options.encodedBody` yourself and set options.headers['Content-Type'] yourself.
 
+Joining Requests
+===
 
-AHR.jsonp(uri, jsonp, params, options)
-----
+    // npm install join
+    // or ender build join
 
-    var flickrApi = "http://api.flickr.com/services/feeds/photos_public.gne?format=json";
-    AHR.jsonp(flickApi, "jsoncallback", {tags: "cat", tagmode: "any"})
-      .when(function (err, Xhr_Or_NodeResponse, data) {
-        // do stuff
-      });
+    var Join = require('join')
+      , join = Join()
+      ;
 
-syncback
-----
-
-The purpose of the syncback is to be able to get at the nativeHttpClient as soon as possible.
-
-    var nodeRequest;
-    AHR.https({
-      uri: "http://example.com/"
-      syncback: function(nativeClient) {
-        nodeRequest = nativeClient;
+    // join(req1, req2, req3, ...);
+    join(
+      request({ "href": "/foo" }),
+      request.get("/bar"),
+    ).when(function (fooArgs, barArgs) {
+      var fArgs, bArgs;
+      fArgs = { err: fooArgs[0], response: fooArgs[1], data: fooArgs[2] };
+      bArgs = { err: barArgs[0], response: barArgs[1], data: barArgs[2] };
+      if (fArgs.err || bArgs.err) {
+        console.log(fArgs.err);
+        console.log(bArgs.err);
       }
     });
-    // do stuff with nodeRquest
 
-TODO
-====
-
-  * maybe ssl shortcuts? heads, gets, posts, puts, deletes, optionss, jsonps
-  * CommonJS http client abstraction

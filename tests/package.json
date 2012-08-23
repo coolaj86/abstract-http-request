@@ -1,0 +1,30 @@
+{
+  "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info/)",
+  "name": "ahr-test",
+  "description": "Tests that ahr installs from npm and pakmanager and that it runs reasonably well",
+  "version": "2.2.2",
+  "homepage": "http://github.com/coolaj86/abstract-http-request",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/coolaj86/abstract-http-request.git"
+  },
+  "main": "app.js",
+  "scripts": {
+      "test": "node index.js"
+    , "postinstall": "./deploy.sh"
+  },
+  "engines": {
+    "node": ">= 0.4.11"
+  },
+  "browserDependencies": {
+      "assert": "0.4.x"
+    , "sequence": "2.x"
+    , "ahr2": ">= 2.2.1"
+  },
+  "dependencies": {
+      "ahr2": ">= 2.2.1"
+    , "sequence": "2.x"
+  },
+  "devDependencies": {
+  }
+}

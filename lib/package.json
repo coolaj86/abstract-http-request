@@ -1,0 +1,41 @@
+{
+    "name": "ahr2"
+  , "main": "index"
+  , "version": "2.2.9"
+  , "homepage": "https://github.com/coolaj86/abstract-http-request"
+  , "description": "An Abstract Http Request for Node.JS (http/https) and the Browser (XMLHttpRequeuest2). For `npm install ahr2` for Node and `pakmanager build` for Ender / Pakmanager. It should be required as `var request = require('ahr2')`"
+  , "repository": {
+        "type": "git"
+      , "url": "git://github.com/coolaj86/abstract-http-request.git"
+    }
+  , "keywords": ["xhr", "ahr", "xmlhttprequest", "http", "https", "file", "browser", "xhr2", "cors", "xdm", "jsonp"]
+  , "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.info)"
+  , "contributors": [
+        "T. Jameson Little <beatgammit@gmail.com>"
+    ]
+  , "engines": {
+        "node": ">= 0.4.0"
+    }
+  , "browserDependencies": {
+        "events.node": ">= 0.4.0"
+      , "url": ">= 0.0.0"
+      , "querystring": ">= 0.0.0"
+      , "future": ">= 2.1.0"
+      , "join": ">= 2.1.0"
+    }
+  , "dependencies": {
+        "future": ">= 2.1.0"
+      , "join": ">= 2.1.0"
+      , "btoa": "1.x"
+      , "bufferjs": "1.0.x"
+      , "File": ">= 0.0.0"
+      , "FileList": ">= 0.0.0"
+      , "FormData": ">= 0.0.0"
+      , "navigator": ">= 0.0.0"
+      , "location": ">= 0.0.0"
+    }
+  , "lib": "."
+  , "directories": {
+        "lib": "."
+    }
+}
