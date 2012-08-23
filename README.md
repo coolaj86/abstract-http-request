@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/coolaj86/abstract-http-request.png)](http://travis-ci.org/coolaj86/abstract-http-request)
 AbstractHttpRequest
 ====
 
