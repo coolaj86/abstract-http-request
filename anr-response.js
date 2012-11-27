@@ -6,10 +6,20 @@
     , events = require('events')
     ;
 
-  function AnrResponse() {
-    this.headers = {};
-    this.wares = [];
+  function AnrResponse(wares) {
+    var self = this
+      ;
+
     events.EventEmitter.call(this);
+    this.headers = {};
+    this.wares = wares;
+
+    self.on('_end', function () {
+      self.context._request._futures.forEach(function (fn) {
+        fn(this._error, this.context._request, this.body);
+      }, self);
+      self.context._request._fulfilled = true;
+    });
   }
 
   util.inherits(AnrResponse, events.EventEmitter);

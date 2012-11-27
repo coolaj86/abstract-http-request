@@ -4,12 +4,37 @@
 
   var util = require('util')
     , events = require('events')
+    , forEachAsync = require('forEachAsync')
     ;
 
-  function AnrRequest() {
-    this.headers = {};
-    this.wares = [];
+  function AnrRequest(wares) {
+    var self = this
+      ;
+
     events.EventEmitter.call(this);
+
+    this.headers = {};
+    this.wares = wares;
+    this._futures = [];
+    this.when = function (fn) {
+      if (self._fulfilled) {
+        fn(self._error, self.context._response, self.context._response.body);
+      }
+      self._futures.push(fn);
+
+      return self;
+    };
+
+    this.on('_start', function () {
+      forEachAsync(self.wares, self._handleHandler, self).then(self._sendRequest);
+    });
+
+    this.on('_end', function () {
+      console.log('loading request wares', self.context._response.wares);
+      //self._response.headers['content-type'] = 'text/plain;charset=utf-8,';
+      //this._response.emit('_start');
+      forEachAsync(self.context._response.wares, self.context._response._handleHandler, self.context._response).then(self.context._response._endResponse);
+    });
   }
   util.inherits(AnrRequest, events.EventEmitter);
 

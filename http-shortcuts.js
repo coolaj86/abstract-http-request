@@ -14,30 +14,26 @@
     };
     Anr.prototype.get = function (url, query) {
       console.log('get');
-      this._abstractHttp('get', url, query);
-      //return this._response;
-      return this;
+      return this._abstractHttp('get', url, query);
     };
     Anr.prototype.post = function (url, query, body) {
       console.log('post');
-      this._abstractHttp('post', url, query, body);
-      return this;
+      return this._abstractHttp('post', url, query, body);
     };
     Anr.prototype.patch = function (url, query, body) {
       console.log('patch');
-      this._abstractHttp('patch', url, query, body);
-      return this;
+      return this._abstractHttp('patch', url, query, body);
     };
     Anr.prototype.put = function (url, query, body) {
       console.log('put');
-      this._abstractHttp('put', url, query, body);
-      return this;
+      return this._abstractHttp('put', url, query, body);
     };
+    // bracket notation for ES3 backwards compat
     Anr.prototype['delete'] = function (url, query, body) {
       console.log('delete');
-      this._abstractHttp('delete', url, query, body);
-      return this;
+      return this._abstractHttp('delete', url, query, body);
     };
+    // alternate method for ES3 backwards compat
     Anr.prototype.del = Anr.prototype['delete'];
   }
 

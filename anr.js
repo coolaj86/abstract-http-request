@@ -7,7 +7,6 @@
     , events = require("events")
     , AnrRequest = require('./anr-request')
     , AnrResponse = require('./anr-response')
-    , forEachAsync = require('forEachAsync')
     , anr
     , key
     ;
@@ -20,9 +19,6 @@
   }
 
   function Anr() {
-    var self = this
-      ;
-
     if (!(this instanceof Anr)) {
       return request.appy(null, arguments);
     }
@@ -30,27 +26,8 @@
     events.EventEmitter.call(this);
     this._anr_proto_ = Anr.prototype;
     this._wares = [];
-    this._request = new AnrRequest();
-    this._response = new AnrResponse();
-    this._futures = [];
-
-    this._request.context = this._response.context = {};
-
-    this.when = function (fn) {
-      if (self._fulfilled) {
-        fn(self._error, self._response, self._response.body);
-      }
-      self._futures.push(fn);
-
-      return self;
-    };
-
-    self._response.on('_end', function () {
-      self._futures.forEach(function (fn) {
-        fn(this._error, this._response, this._response.body);
-      }, self);
-      self._fulfilled = true;
-    });
+    this._requestWares = [];
+    this._responseWares = [];
   }
 
   util.inherits(Anr, events.EventEmitter);
@@ -88,9 +65,9 @@
   };
   Anr.prototype.for = function (type, fn) {
     if ('request' === type) {
-      this._request.wares.push(fn);
+      this._requestWares.push(fn);
     } else if ('response' === type) {
-      this._response.wares.push(fn);
+      this._responseWares.push(fn);
     } else {
       throw new Error('`for` can only accept functions for `request` and `response`.');
     }
@@ -138,14 +115,24 @@
     urlObj.body = options.body;
     urlObj.method = urlObj.method || 'get';
 
-    self._options = urlObj;
+    return urlObj;
   };
   Anr.prototype.http = function (urlStr, options) {
     console.log('[CORE] http');
-    var self = this
+    var context = {}
+      , request
+      , response
       ;
 
+    request = new AnrRequest(this._requestWares);
+    response = new AnrResponse(this._responseWares);
+    request.context = context;
+    response.context = context;
+
     this._parse(urlStr, options);
+    context._options = this._parse(urlStr, options);
+    context._request = request;
+    context._response = response;
     
     console.log('[CORE] wares');
     this._wares.forEach(function (ware) {
@@ -158,14 +145,14 @@
       if (host) {
         urlObj = url.parse(host);
         host = urlObj.host || host;
-        if (!(this._options.host||"").match(host)) {
-          console.log('[WARE] host skip', host, this._options.host);
+        if (!(context._options.host||"").match(host)) {
+          console.log('[WARE] host skip', host, context._options.host);
           return;
         }
       }
 
-      if (mount && !(this._options.pathname||"").match(mount)) {
-        console.log('[WARE] mount skip', mount, this._options.pathname);
+      if (mount && !(context._options.pathname||"").match(mount)) {
+        console.log('[WARE] mount skip', mount, context._options.pathname);
         return;
       }
 
@@ -173,25 +160,8 @@
       fn(this);
     }, this);
 
-    this._request.on('_start', function () {
-      forEachAsync(self._request.wares, self._request._handleHandler, self._request).then(self._request._sendRequest);
-    });
-
-    this._request.on('_end', function () {
-      console.log('loading request wares', self._response.wares);
-      //self._response.headers['content-type'] = 'text/plain;charset=utf-8,';
-      //this._response.emit('_start');
-      forEachAsync(self._response.wares, self._response._handleHandler, self._response).then(self._response._endResponse);
-    });
-
-    this._request.emit('_start');
-    return this;
-  };
-  Anr.prototype.send = function () {
-    this._sendRequest();
-  };
-  Anr.prototype.end = function () {
-    this._endResponse();
+    request.emit('_start');
+    return request;
   };
 
   Anr.create = function (a, b, c) {
