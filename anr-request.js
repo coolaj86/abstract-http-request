@@ -8,9 +8,11 @@
 
   function AnrRequest() {
     this.headers = {};
+    this.wares = [];
     events.EventEmitter.call(this);
   }
   util.inherits(AnrRequest, events.EventEmitter);
+
   AnrRequest.prototype.send = function () {
     if (this._requestSent) {
       console.warn('already sent request');
@@ -19,6 +21,29 @@
 
     this._requestSent = true;
     console.log('sent, or so they say');
+  };
+  AnrRequest.prototype._handleHandler = function (next, fn) {
+    fn(this, next);
+  };
+  AnrRequest.prototype._sendRequest = function () {
+    // TODO actually handle request
+    var self = this
+      ;
+    console.log('request sending [fake]');
+    /*
+     * host
+     * hostname
+     * port
+     * localAddress
+     * socketPath
+     * method
+     * path
+     * headers
+     * auth
+     * agent
+     */
+    // TODO handle accept headers
+    self.emit('_end');
   };
 
   module.exports = AnrRequest;

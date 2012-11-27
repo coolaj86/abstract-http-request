@@ -30,11 +30,9 @@
     events.EventEmitter.call(this);
     this._anr_proto_ = Anr.prototype;
     this._wares = [];
-    this._requestWares = [];
-    this._responseWares = [];
-    this._futures = [];
     this._request = new AnrRequest();
     this._response = new AnrResponse();
+    this._futures = [];
 
     this._request.context = this._response.context = {};
 
@@ -90,9 +88,9 @@
   };
   Anr.prototype.for = function (type, fn) {
     if ('request' === type) {
-      this._requestWares.push(fn);
+      this._request.wares.push(fn);
     } else if ('response' === type) {
-      this._responseWares.push(fn);
+      this._response.wares.push(fn);
     } else {
       throw new Error('`for` can only accept functions for `request` and `response`.');
     }
@@ -176,64 +174,24 @@
     }, this);
 
     this._request.on('_start', function () {
-      forEachAsync(self._requestWares, self._handleRequestHandler, self).then(self._sendRequest);
+      forEachAsync(self._request.wares, self._request._handleHandler, self._request).then(self._request._sendRequest);
     });
 
     this._request.on('_end', function () {
-      console.log('loading request wares', self._responseWares);
+      console.log('loading request wares', self._response.wares);
       //self._response.headers['content-type'] = 'text/plain;charset=utf-8,';
       //this._response.emit('_start');
-      forEachAsync(self._responseWares, self._handleResponseHandler, self).then(self._endResponse);
+      forEachAsync(self._response.wares, self._response._handleHandler, self._response).then(self._response._endResponse);
     });
 
     this._request.emit('_start');
     return this;
-  };
-  Anr.prototype._endResponse = function () {
-    // TODO atually handle response
-    var self = this
-      ;
-
-    // Right now we're just mocking the data in
-    // the _end event, so it is fired immediately
-    process.nextTick(function () {
-      self._response.emit('data', "hello ");
-      self._response.emit('data', "world!");
-      self._response.emit('end');
-    });
-  };
-  Anr.prototype._sendRequest = function () {
-    // TODO actually handle request
-    var self = this
-      ;
-    console.log('request sending [fake]');
-    /*
-     * host
-     * hostname
-     * port
-     * localAddress
-     * socketPath
-     * method
-     * path
-     * headers
-     * auth
-     * agent
-     */
-    // TODO handle accept headers
-    self._request.emit('_end');
   };
   Anr.prototype.send = function () {
     this._sendRequest();
   };
   Anr.prototype.end = function () {
     this._endResponse();
-  };
-  Anr.prototype._handleRequestHandler = function (next, fn) {
-    fn(this._request, next);
-  };
-  Anr.prototype._handleResponseHandler = function (next, fn) {
-    console.log('handling a response handler...');
-    fn(this._response, next);
   };
 
   Anr.create = function (a, b, c) {
