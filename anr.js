@@ -1,8 +1,9 @@
-/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true eqeqeq:true immed:true latedef:true*/
+/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true eqeqeq:true immed:true latedef:true unused:true undef:true*/
 (function () {
   "use strict";
 
   var util = require("util")
+    , url = require('url')
     , events = require("events")
     , AnrRequest = require('./anr-request')
     , AnrResponse = require('./anr-response')
@@ -96,57 +97,130 @@
       throw new Error('`for` can only accept functions for `request` and `response`.');
     }
   };
-  Anr.prototype.http = function (options) {
+  // Unlike previous versions of AHR, this does not modify the original options
+  Anr.prototype._parse = function (urlStr, options) {
+    var self = this
+      , urlObj
+      , query
+      ;
+
+    options = options || {};
+    if ('string' !== typeof urlStr) {
+      options = urlStr;
+    }
+
+    urlStr = options.url || options.uri || urlStr;
+    query = options.query || {};
+
+    urlObj = url.parse(urlStr, true, true);
+    urlObj.search = null;
+
+    if (options.user || options.username || options.pass || options.password) {
+      urlObj.auth = urlObj.auth || (options.user || options.username || '') + ':' + (options.pass || options.password || '');
+    }
+
+    Object.keys(query).forEach(function (key) {
+      urlObj.query[key] = options.query[key];
+    });
+    options.query = null;
+
+    Object.keys(urlObj).forEach(function (key) {
+      var val = options[key]
+        ;
+
+      // don't replace something with '', undefined, null
+      // but do replace for 0, false
+      if (null === val || 'undefined' === typeof val || '' === val) {
+        return;
+      }
+
+      urlObj[key] = options[key];
+    });
+
+    urlObj.body = options.body;
+    urlObj.method = urlObj.method || 'get';
+
+    self._options = urlObj;
+  };
+  Anr.prototype.http = function (urlStr, options) {
+    console.log('[CORE] http');
     var self = this
       ;
 
-    console.log('http');
+    this._parse(urlStr, options);
     
-    console.log(this._wares);
+    console.log('[CORE] wares');
     this._wares.forEach(function (ware) {
       var fn = ware[2]
         , mount = ware[1]
         , host = ware[0]
+        , urlObj
         ;
 
-      if (host && /*!this._options.match*/ false) {
+      if (host) {
+        urlObj = url.parse(host);
+        host = urlObj.host || host;
+        if (!(this._options.host||"").match(host)) {
+          console.log('[WARE] host skip', host, this._options.host);
+          return;
+        }
+      }
+
+      if (mount && !(this._options.pathname||"").match(mount)) {
+        console.log('[WARE] mount skip', mount, this._options.pathname);
         return;
       }
 
-      if (mount && /*!this._options.match*/ false) {
-        return;
-      }
-
+      console.log('[WARE] matched for ', host, mount, JSON.stringify(fn.toString().substr(0, 30)));
       fn(this);
     }, this);
 
     this._request.on('_start', function () {
       forEachAsync(self._requestWares, self._handleRequestHandler, self).then(self._sendRequest);
     });
+
     this._request.on('_end', function () {
       console.log('loading request wares', self._responseWares);
-      self._response.headers['content-type'] = 'text/plain;charset=utf-8,';
+      //self._response.headers['content-type'] = 'text/plain;charset=utf-8,';
+      //this._response.emit('_start');
       forEachAsync(self._responseWares, self._handleResponseHandler, self).then(self._endResponse);
-      //this._request.emit('_start');
-      process.nextTick(function () {
-        self._response.emit('data', "hello world");
-        process.nextTick(function () {
-          self._response.emit('end');
-        });
-      });
     });
 
     this._request.emit('_start');
+    return this;
   };
   Anr.prototype._endResponse = function () {
-    // TODO actually handle response
-    console.log('endResponse', this._response);
-    this._response.emit('_end');
+    // TODO atually handle response
+    var self = this
+      ;
+
+    // Right now we're just mocking the data in
+    // the _end event, so it is fired immediately
+    process.nextTick(function () {
+      self._response.emit('data', "hello ");
+      self._response.emit('data', "world!");
+      self._response.emit('end');
+    });
   };
   Anr.prototype._sendRequest = function () {
     // TODO actually handle request
+    var self = this
+      ;
     console.log('request sending [fake]');
-    this._request.emit('_end');
+    /*
+     * host
+     * hostname
+     * port
+     * localAddress
+     * socketPath
+     * method
+     * path
+     * headers
+     * auth
+     * agent
+     */
+    // TODO handle accept headers
+    self._request.emit('_end');
   };
   Anr.prototype.send = function () {
     this._sendRequest();

@@ -3,41 +3,42 @@
   "use strict";
 
   function addShortcuts(Anr) {
-    Anr.prototype._abstractHttp = function () {
+    Anr.prototype._abstractHttp = function (method, urlStr, query, body) {
       console.log('abstractHttp');
-      this.http();
-      return this;
+      return this.http(urlStr, { method: method, query: query, body: body });
     };
-    Anr.prototype.https = function () {
+    Anr.prototype.https = function (options) {
       console.log('https');
-      this._abstractHttp();
-      return this;
+      options.secure = true;
+      return this.http(options);
     };
-    Anr.prototype.get = function () {
+    Anr.prototype.get = function (url, query) {
       console.log('get');
-      this._abstractHttp();
+      this._abstractHttp('get', url, query);
+      //return this._response;
       return this;
     };
-    Anr.prototype.post = function () {
+    Anr.prototype.post = function (url, query, body) {
       console.log('post');
-      this._abstractHttp();
+      this._abstractHttp('post', url, query, body);
       return this;
     };
-    Anr.prototype.patch = function () {
+    Anr.prototype.patch = function (url, query, body) {
       console.log('patch');
-      this._abstractHttp();
+      this._abstractHttp('patch', url, query, body);
       return this;
     };
-    Anr.prototype.put = function () {
+    Anr.prototype.put = function (url, query, body) {
       console.log('put');
-      this._abstractHttp();
+      this._abstractHttp('put', url, query, body);
       return this;
     };
-    Anr.prototype.delete = function () {
+    Anr.prototype['delete'] = function (url, query, body) {
       console.log('delete');
-      this._abstractHttp();
+      this._abstractHttp('delete', url, query, body);
       return this;
     };
+    Anr.prototype.del = Anr.prototype['delete'];
   }
 
   module.exports = function () {

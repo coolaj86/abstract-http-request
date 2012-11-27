@@ -14,8 +14,13 @@
         req.headers['accept'] = "";
       }
 
+      // TODO handle accept header with array where the first is the most desired???
       if (!/text/.test(accept)) {
-        req.headers['accept'] += ' text/plain;q=0.5';
+        if (accept) {
+          req.headers['accept'] += ', text/plain;q=0.5';
+        } else {
+          req.headers['accept'] += 'text/plain;q=1.0';
+        }
       }
 
       console.log('did request text');
@@ -23,7 +28,7 @@
     });
 
     anr.for('response', function (res, next) {
-      console.log('calling the text handler');
+      console.log('[TEXT] attempt response -----------------------------------');
       var data = ''
         ;
 
@@ -34,26 +39,22 @@
       res.__text = true;
 
       if (!/text/.test(res.headers['content-type'])) {
-        console.log('no content-type matching text', res.headers);
+        console.log('[TEXT] skip: no text in content-type');
         next();
         return;
       }
 
       res.on('data', function (chunk) {
-        console.log('TEXT onData', chunk);
+        console.log('[TEXT] onData', chunk);
         data += chunk;
       });
 
       res.on('end', function () {
-        console.log('TEXT onEnd');
+        console.log('[TEXT] onEnd');
         res.body = data;
         next();
       });
-
-      console.log('did response text');
     });
-
-    console.log('did for req / res text');
   }
 
   module.exports = function () {

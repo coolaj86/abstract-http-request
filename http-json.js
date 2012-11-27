@@ -5,7 +5,7 @@
   function json(anr) {
     anr.for('request', function (req, next) {
       /*jshint sub:true*/
-      console.log('req', req);
+      console.log('[JSON] req', req);
       var accept = req.headers['accept']
         ;
 
@@ -14,16 +14,21 @@
         req.headers['accept'] = "";
       }
 
+      // TODO handle accept header with array where the first is the most desired???
       if (!/json/.test(accept)) {
-        req.headers['accept'] += ' application/json;q=1.0';
+        if (accept) {
+          req.headers['accept'] += ', application/json;q=0.5';
+        } else {
+          req.headers['accept'] += 'application/json;q=1.0';
+        }
       }
 
-      console.log('did request');
+      console.log('[JSON] did request');
       next();
     });
 
     anr.for('response', function (res, next) {
-      console.log('&^%F%&^%&^%&^%^&&^%&%&^%*&^*%&^%&^*%&*%&^*%');
+      console.log('[JSON] attempt response -----------------------------------');
       var data = ''
         ;
 
@@ -34,13 +39,14 @@
       res.__json = true;
 
       if (!/json/.test(res.headers['content-type'])) {
+        console.log('[JSON] skip: no json in content-type');
         next();
         return;
       }
 
       res.on('data', function (chunk) {
         console.log('onData');
-        data += chunk;
+        data += chunk.toString();
       });
 
       res.on('end', function () {
@@ -53,11 +59,7 @@
         }
         next();
       });
-
-      console.log('did response');
     });
-
-    console.log('did for req / res');
   }
 
   module.exports = function () {

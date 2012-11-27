@@ -10,6 +10,7 @@
     this.headers = {};
     events.EventEmitter.call(this);
   }
+  util.inherits(AnrRequest, events.EventEmitter);
   AnrRequest.prototype.send = function () {
     if (this._requestSent) {
       console.warn('already sent request');
@@ -19,8 +20,6 @@
     this._requestSent = true;
     console.log('sent, or so they say');
   };
-
-  util.inherits(AnrRequest, events.EventEmitter);
 
   module.exports = AnrRequest;
 }());
