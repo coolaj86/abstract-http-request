@@ -38,6 +38,7 @@
       }
       res.__json = true;
 
+      console.log('[JSON] ----------------------------------------------', res.headers);
       if (!/json/.test(res.headers['content-type'])) {
         console.log('[JSON] skip: no json in content-type');
         next();

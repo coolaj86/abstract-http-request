@@ -11,6 +11,25 @@
     .extend(anr.Http())
     .use('http://foobar3000.com', '/echo', anr.json())
     .use(anr.text())
+    .use(function (anr/*, pr, req, res*/) {
+        anr.for('prequest', function (req, next) {
+          req.headers['X-Test'] = 'Foo-Bar Bazzled';
+          next();
+        });
+        anr.for('request', function (req, next) {
+          if (!req.body) {
+            req.end();
+          }
+          //next();
+        });
+        anr.for('response', function (res, next) {
+          // TODO should be able to replace this response with another
+          // I.E. 301 redirect
+          console.log('After JSON');
+          console.log(res.body);
+          //next();
+        });
+      })
     ;
 
   sequence
@@ -20,23 +39,21 @@
         console.error('error', err);
         console.log('headers', ahr.headers);
         console.log('data', data);
-      }).on('response', function (res) {
+      });/*.on('response', function (res) {
+        var chunks = []
+          ;
         console.log('response is coming ------------------------------------------------------------');
         //req.context._response
-        res.on('data', function (data) {
-          console.log('[data] !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', data);
+        res.on('data', function (chunk) {
+          console.log('[data]');
+          chunks.push(chunk);
         });
         //req.context._response
         res.on('end', function () {
-          console.log('[end] !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+          console.log('[end]');
+          console.log(Buffer.concat(chunks).toString());
         });
       });
-      console.log('REQ *******************************', req);
-      /*
-      req.on('response', function (res) {
-        console.log('response is coming ------------------------------------------------------------');
-      });
-      req.emit('response');
       */
     })
     .then(function () {

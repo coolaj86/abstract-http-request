@@ -86,7 +86,7 @@
       options = urlStr;
     }
 
-    urlStr = options.url || options.uri || urlStr;
+    urlStr = options.url || options.uri || options.href || urlStr;
     query = options.query || {};
 
     urlObj = url.parse(urlStr, true, true);
