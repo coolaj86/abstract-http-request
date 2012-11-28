@@ -20,13 +20,24 @@
         console.error('error', err);
         console.log('headers', ahr.headers);
         console.log('data', data);
+      }).on('response', function (res) {
+        console.log('response is coming ------------------------------------------------------------');
+        //req.context._response
+        res.on('data', function (data) {
+          console.log('[data] !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', data);
+        });
+        //req.context._response
+        res.on('end', function () {
+          console.log('[end] !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+        });
       });
-      req.context._response.on('data', function (data) {
-        console.log('[data] !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', data);
+      console.log('REQ *******************************', req);
+      /*
+      req.on('response', function (res) {
+        console.log('response is coming ------------------------------------------------------------');
       });
-      req.context._response.on('end', function () {
-        console.log('[end] !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-      });
+      req.emit('response');
+      */
     })
     .then(function () {
       var req = client.get('http://foobar3000.com/gecho/example.json').when(function (err, ahr, data) {

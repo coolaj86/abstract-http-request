@@ -4,6 +4,7 @@
 
   var util = require('util')
     , events = require('events')
+    , forEachAsync = require('forEachAsync')
     ;
 
   function AnrResponse(wares) {
@@ -14,6 +15,9 @@
     this.headers = {};
     this.wares = wares;
 
+    self.on('_start', function () {
+      forEachAsync(self.wares, self._handleHandler, self).then(self._endResponse);
+    });
     self.on('_end', function () {
       self.context._request._futures.forEach(function (fn) {
         fn(this._error, this.context._request, this.body);
@@ -22,6 +26,7 @@
     });
   }
 
+  // TODO stream
   util.inherits(AnrResponse, events.EventEmitter);
 
   AnrResponse.prototype._endResponse = function () {

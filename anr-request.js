@@ -26,19 +26,28 @@
     };
 
     this.on('_start', function () {
-      forEachAsync(self.wares, self._handleHandler, self).then(self._sendRequest);
+      forEachAsync(self.wares, self._handleHandler, self).then(self._send);
     });
 
     this.on('_end', function () {
-      console.log('loading request wares', self.context._response.wares);
+      console.log('loading response wares', self.context._response.wares);
       //self._response.headers['content-type'] = 'text/plain;charset=utf-8,';
       //this._response.emit('_start');
-      forEachAsync(self.context._response.wares, self.context._response._handleHandler, self.context._response).then(self.context._response._endResponse);
+      console.log(self);
+      process.nextTick(function () {
+        self.emit('response', self.context._response);
+        self.context._response.emit('_start');
+      });
     });
   }
+
+  // TODO stream
   util.inherits(AnrRequest, events.EventEmitter);
 
-  AnrRequest.prototype.send = function () {
+  AnrRequest.prototype._handleHandler = function (next, fn) {
+    fn(this, next);
+  };
+  AnrRequest.prototype._send = function () {
     if (this._requestSent) {
       console.warn('already sent request');
       return;
@@ -46,11 +55,7 @@
 
     this._requestSent = true;
     console.log('sent, or so they say');
-  };
-  AnrRequest.prototype._handleHandler = function (next, fn) {
-    fn(this, next);
-  };
-  AnrRequest.prototype._sendRequest = function () {
+
     // TODO actually handle request
     var self = this
       ;

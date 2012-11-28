@@ -74,8 +74,7 @@
   };
   // Unlike previous versions of AHR, this does not modify the original options
   Anr.prototype._parse = function (urlStr, options) {
-    var self = this
-      , urlObj
+    var urlObj
       , query
       ;
 
