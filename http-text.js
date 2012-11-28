@@ -3,7 +3,7 @@
   "use strict";
 
   function text(anr) {
-    anr.for('request', function (req, next) {
+    anr.for('prequest', function (req, next) {
       /*jshint sub:true*/
       console.log('req', req);
       var accept = req.headers['accept']
@@ -23,7 +23,7 @@
         }
       }
 
-      console.log('did request text');
+      console.log('[TEXT] did prequest');
       next();
     });
 

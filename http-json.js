@@ -3,7 +3,7 @@
   "use strict";
 
   function json(anr) {
-    anr.for('request', function (req, next) {
+    anr.for('prequest', function (req, next) {
       /*jshint sub:true*/
       console.log('[JSON] req', req);
       var accept = req.headers['accept']
@@ -23,7 +23,7 @@
         }
       }
 
-      console.log('[JSON] did request');
+      console.log('[JSON] did prequest');
       next();
     });
 

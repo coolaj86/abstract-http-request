@@ -26,6 +26,7 @@
     events.EventEmitter.call(this);
     this._anr_proto_ = Anr.prototype;
     this._wares = [];
+    this._prequestWares = [];
     this._requestWares = [];
     this._responseWares = [];
   }
@@ -64,12 +65,14 @@
     return this;
   };
   Anr.prototype.for = function (type, fn) {
-    if ('request' === type) {
+    if ('prequest' === type) {
+      this._prequestWares.push(fn);
+    } else if ('request' === type) {
       this._requestWares.push(fn);
     } else if ('response' === type) {
       this._responseWares.push(fn);
     } else {
-      throw new Error('`for` can only accept functions for `request` and `response`.');
+      throw new Error('`for` can only accept functions for `prequest`, `request` and `response`.');
     }
   };
   // Unlike previous versions of AHR, this does not modify the original options
@@ -111,9 +114,25 @@
       urlObj[key] = options[key];
     });
 
-    urlObj.body = options.body;
-    urlObj.method = urlObj.method || 'get';
+    urlObj.headers = urlObj.headers || {};
+    // TODO restrict some headers
 
+    urlObj.body = options.body;
+    urlObj.method = urlObj.method || 'GET';
+    urlObj.method = urlObj.method.toUpperCase();
+
+    if ('GET' === urlObj.method) {
+      if (!urlObj.forceGetBody) {
+        if (urlObj.body) {
+          throw new Error(
+              'refusing to set a body for a GET. use `forceGetBody: true` to force\n'
+            + '(Your browser will probably strip the body or convert it to a POST)'
+          );
+        }
+        urlObj.body = null;
+      }
+    }
+    
     return urlObj;
   };
   Anr.prototype.http = function (urlStr, options) {
@@ -123,13 +142,10 @@
       , response
       ;
 
-    request = new AnrRequest(this._requestWares);
-    response = new AnrResponse(this._responseWares);
-    request.context = context;
-    response.context = context;
-
-    this._parse(urlStr, options);
     context._options = this._parse(urlStr, options);
+    request = new AnrRequest(this._prequestWares, this._requestWares, context);
+    response = new AnrResponse(this._responseWares, context);
+
     context._request = request;
     context._response = response;
     
@@ -159,7 +175,7 @@
       fn(this);
     }, this);
 
-    request.emit('_start');
+    request._prequest();
     return request;
   };
 
