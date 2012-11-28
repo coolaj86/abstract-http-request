@@ -5,7 +5,6 @@
   function text(anr) {
     anr.for('prequest', function (req, next) {
       /*jshint sub:true*/
-      console.log('req', req);
       var accept = req.headers['accept']
         ;
 
@@ -23,7 +22,7 @@
         }
       }
 
-      console.log('[TEXT] did prequest');
+      console.log('[TEXT] matched prequest');
       next();
     });
 

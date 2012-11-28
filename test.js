@@ -25,7 +25,7 @@
         anr.for('response', function (res, next) {
           // TODO should be able to replace this response with another
           // I.E. 301 redirect
-          console.log('After JSON');
+          console.log('[X-Test] post-others');
           console.log(res.body);
           //next();
         });
@@ -35,10 +35,10 @@
   sequence
     .then(function (next) {
       var req = client.get('http://foobar3000.com/echo/example.json').when(function (err, ahr, data) {
-        console.log('.when called!!! YAY');
+        console.log('[WHEN] I have been called!!! YAY');
         console.error('error', err);
-        console.log('headers', ahr.headers);
-        console.log('data', data);
+        console.log('[WHEN] headers', ahr.headers);
+        console.log('[WHEN] data', data);
       });/*.on('response', function (res) {
         var chunks = []
           ;

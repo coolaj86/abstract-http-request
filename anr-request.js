@@ -111,8 +111,7 @@
      */
     self._nodeRequest = httpClient.request(options);
     self._nodeRequest.on('response', function (res) {
-      console.log('loading response wares');
-      //console.log(self.context._response.wares);
+      console.log('[AREQ] loading response wares');
       self.emit('response', self.context._response);
       self.context._response._start(res);
     });

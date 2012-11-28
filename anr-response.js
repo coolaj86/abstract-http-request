@@ -64,7 +64,7 @@
     return this._nodeResponse.resume();
   };
   AnrResponse.prototype._handleHandler = function (next, fn) {
-    console.log('handling a response handler...');
+    console.log('[ARES] handling a response handler...');
     fn(this, next);
   };
 

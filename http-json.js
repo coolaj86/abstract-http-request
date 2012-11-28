@@ -1,11 +1,10 @@
-/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true eqeqeq:true immed:true latedef:true*/
+/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true eqeqeq:true immed:true latedef:true undef:true unused:true*/
 (function () {
   "use strict";
 
   function json(anr) {
     anr.for('prequest', function (req, next) {
       /*jshint sub:true*/
-      console.log('[JSON] req', req);
       var accept = req.headers['accept']
         ;
 
@@ -23,7 +22,7 @@
         }
       }
 
-      console.log('[JSON] did prequest');
+      console.log('[JSON] matched prequest');
       next();
     });
 
@@ -38,7 +37,8 @@
       }
       res.__json = true;
 
-      console.log('[JSON] ----------------------------------------------', res.headers);
+      console.log('[JSON] headers');
+      console.log(res.headers);
       if (!/json/.test(res.headers['content-type'])) {
         console.log('[JSON] skip: no json in content-type');
         next();
@@ -46,12 +46,12 @@
       }
 
       res.on('data', function (chunk) {
-        console.log('onData');
+        console.log('[JSON] data');
         data += chunk.toString();
       });
 
       res.on('end', function () {
-        console.log('onEnd');
+        console.log('[JSON] end');
         try {
           res.body = JSON.parse(data);
         } catch(e) {
