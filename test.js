@@ -34,7 +34,11 @@
 
   sequence
     .then(function (next) {
-      var req = client.get('http://foobar3000.com/echo/example.json').when(function (err, ahr, data) {
+      var req = client.get('http://foobar3000.com/echo/example.json');
+      
+      
+      /*
+      .when(function (err, ahr, data) {
         console.log('[WHEN] I have been called!!! YAY');
         console.error('error', err);
         console.log('[WHEN] headers', ahr.headers);
