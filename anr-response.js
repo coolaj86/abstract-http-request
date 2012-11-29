@@ -1,16 +1,14 @@
-/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true eqeqeq:true immed:true latedef:true*/
+/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true eqeqeq:true immed:true latedef:true unused:true undef:true*/
 (function () {
   "use strict";
 
   var util = require('util')
     , events = require('events')
     , forEachAsync = require('forEachAsync')
+    , p
     ;
 
   function AnrResponse(wares, context) {
-    var self = this
-      ;
-
     events.EventEmitter.call(this);
 
     this.context = context;
@@ -22,48 +20,65 @@
     this.total = Infinity;
     this.loaded = 0;
     this.statusCode = null;
-
-    self.on('_end', function () {
-      self.context._request._futures.forEach(function (fn) {
-        fn(this._error, this.context._request, this.body);
-      }, self);
-      self.context._request._fulfilled = true;
-    });
+    this._chunks = [];
   }
 
   // TODO stream
   util.inherits(AnrResponse, events.EventEmitter);
 
-  AnrResponse.prototype._start = function (res) {
-    var self = this
+  p = AnrResponse.prototype;
+  p._fulfill = function () {
+    var me = this
+      ;
+
+    me.context._request._futures.forEach(function (fn) {
+      fn(this._error, this.context._request, this.body);
+    }, me);
+    me.context._request._fulfilled = true;
+  };
+  p._start = function (res) {
+    var me = this
       ;
     // headers have been received
-    self._nodeResponse = res;
+    me._nodeResponse = res;
     res.on('data', function (chunk) {
-      self.loaded += chunk.length;
-      self.emit('progress');
-      self.emit('data', chunk);
+      me.loaded += chunk.length;
+      me.emit('progress');
+      me.emit('data', chunk);
     });
     res.on('end', function () {
-      self.emit('end');
+      me.completed = true;
+      me.emit('end');
     });
     res.on('close', function () {
-      self.emit('close');
+      me.emit('close');
     });
-    self.statusCode = res.statusCode;
-    self.headers = res.headers;
-    forEachAsync(self.wares, self._handleHandler, self).then(function () {
-      // i dunno
-      console.log('[ARES] it happened...');
+    me.statusCode = res.statusCode;
+    me.headers = res.headers;
+
+    forEachAsync(me.wares, me._handleHandler, me).then(function () {
+      console.log('[ARES] not handled by any of the wares, giving way to `response` handler.');
+      me.context._request.emit('response', me.context._response);
+      if (me.completed) {
+        me._fulfill();
+      } else {
+        me.on('data', function (chunk) {
+          me._chunks.push(chunk);
+        });
+        me.on('end', function () {
+          me.body = Buffer.concat(me.chunks);
+          me.fulfill();
+        });
+      }
     });
   };
-  AnrResponse.prototype.pause = function () {
+  p.pause = function () {
     return this._nodeResponse.pause();
   };
-  AnrResponse.prototype.resume = function () {
+  p.resume = function () {
     return this._nodeResponse.resume();
   };
-  AnrResponse.prototype._handleHandler = function (next, fn) {
+  p._handleHandler = function (next, fn) {
     console.log('[ARES] handling a response handler...');
     fn(this, next);
   };

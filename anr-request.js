@@ -7,10 +7,11 @@
     , forEachAsync = require('forEachAsync')
     , http = require('http')
     , https = require('https')
+    , p
     ;
 
   function AnrRequest(prequest, wares, context) {
-    var self = this
+    var me = this
       ;
 
     events.EventEmitter.call(this);
@@ -24,12 +25,12 @@
     this.total = Infinity;
     this.loaded = 0;
     this.when = function (fn) {
-      if (self._fulfilled) {
-        fn(self._error, self.context._response, self.context._response.body);
+      if (me._fulfilled) {
+        fn(me._error, me.context._response, me.context._response.body);
       }
-      self._futures.push(fn);
+      me._futures.push(fn);
 
-      return self;
+      return me;
     };
     this.on('pipe', function () {
       throw new Error('[AREQ] TODO implement `pipe`');
@@ -39,39 +40,40 @@
   // TODO stream
   util.inherits(AnrRequest, events.EventEmitter);
 
-  AnrRequest.prototype.abort = function () {
+  p = AnrRequest.prototype;
+  p.abort = function () {
     return this._nodeRequest.abort();
   };
-  AnrRequest.prototype.setTimeout = function (t, fn) {
+  p.setTimeout = function (t, fn) {
     return this._nodeRequest.setTimeout(t, fn);
   };
-  AnrRequest.prototype._prequest = function () {
-    var self = this
+  p._prequest = function () {
+    var me = this
       ;
 
     // TODO get some callback for other todo
     process.nextTick(function () {
-      forEachAsync(self.prequestWares, self._handleHandler, self).then(function () {
+      forEachAsync(me.prequestWares, me._handleHandler, me).then(function () {
         console.log('[AREQ] handled prequest headers');
         process.nextTick(function () {
-          self._sendHeaders();
+          me._sendHeaders();
           console.log('[AREQ] sent headers');
           // default to built-in write method
-          forEachAsync(self.wares, self._handleHandler, self).then(self._defaultWrite);
+          forEachAsync(me.wares, me._handleHandler, me).then(me._defaultWrite);
         });
       });
     });
   };
-  AnrRequest.prototype._handleHandler = function (next, fn) {
+  p._handleHandler = function (next, fn) {
     fn(this, next);
   };
-  AnrRequest.prototype.write = function (data, encoding) {
+  p.write = function (data, encoding) {
     // TODO allow some sort of transformation before actually writing.
     this.emit('data', data);
     return this._nodeRequest.write(data, encoding);
   };
-  AnrRequest.prototype.end = function (data, encoding) {
-    var self = this
+  p.end = function (data, encoding) {
+    var me = this
       ;
 
     if (data) {
@@ -79,13 +81,13 @@
     }
     return this._nodeRequest.end();
   };
-  AnrRequest.prototype._sendHeaders = function () {
+  p._sendHeaders = function () {
     if (this._requestSent) {
       console.warn('already sent request');
       return;
     }
 
-    var self = this
+    var me = this
       , httpClient
       , options = this.context._options
       ;
@@ -109,32 +111,31 @@
      * auth
      * agent
      */
-    self._nodeRequest = httpClient.request(options);
-    self._nodeRequest.on('response', function (res) {
+    me._nodeRequest = httpClient.request(options);
+    me._nodeRequest.on('response', function (res) {
       console.log('[AREQ] loading response wares');
-      self.emit('response', self.context._response);
-      self.context._response._start(res);
+      me.context._response._start(res);
     });
-    self._nodeRequest.on('error', function (err) {
-      self.emit('error', err);
+    me._nodeRequest.on('error', function (err) {
+      me.emit('error', err);
     });
-    self._nodeRequest.on('timeout', function (err) {
-      self.emit('timeout', err);
+    me._nodeRequest.on('timeout', function (err) {
+      me.emit('timeout', err);
     });
 
-    self._requestSent = true;
+    me._requestSent = true;
     console.log('[AREQ] Sent Request Headers');
     // TODO make stream writable at this point, but not before
   };
-  AnrRequest.prototype._defaultWrite = function () {
+  p._defaultWrite = function () {
     console.log('[AREQ] default Write');
     // TODO progress for loaded
-    var self = this
+    var me = this
       , options = this.context._options
       ;
 
     if (null === options.body) {
-      self.end();
+      me.end();
       return;
     }
 
@@ -144,18 +145,18 @@
     }
 
     if ('string' === typeof options.body || options.body instanceof Buffer) {
-      self.end(options.body);
+      me.end(options.body);
       return;
     }
 
     if ('function' === typeof options.body.pipe) {
       options.body.pipe(this).on('end', function () {
-        self.end();
+        me.end();
       });
       return;
     }
 
-    self.end(JSON.stringify(options.body));
+    me.end(JSON.stringify(options.body));
   };
 
   module.exports = AnrRequest;
