@@ -52,15 +52,13 @@
       ;
 
     // TODO get some callback for other todo
-    process.nextTick(function () {
-      forEachAsync(me.prequestWares, me._handleHandler, me).then(function () {
-        console.log('[AREQ] handled prequest headers');
-        process.nextTick(function () {
-          me._sendHeaders();
-          console.log('[AREQ] sent headers');
-          // default to built-in write method
-          forEachAsync(me.wares, me._handleHandler, me).then(me._defaultWrite);
-        });
+    forEachAsync(me.prequestWares, me._handleHandler, me).then(function () {
+      console.log('[AREQ] handled prequest headers');
+      process.nextTick(function () {
+        me._sendHeaders();
+        console.log('[AREQ] sent headers');
+        // default to built-in write method
+        forEachAsync(me.wares, me._handleHandler, me).then(me._defaultWrite);
       });
     });
   };
@@ -68,8 +66,10 @@
     fn(this, next);
   };
   p.write = function (data, encoding) {
-    // TODO allow some sort of transformation before actually writing.
-    this.emit('data', data);
+    // NOTE: If a module wants to do some sort of transformation before actually
+    // writing the data, it can overload this write function:
+    // var origWrite = req.write;
+    // req.write = function (chunk) { origWrite.apply(req, chunk); }
     return this._nodeRequest.write(data, encoding);
   };
   p.end = function (data, encoding) {
