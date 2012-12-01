@@ -2,11 +2,15 @@
 (function () {
   "use strict";
 
-  var util = require("util")
+  process.nextTick = global.setImmediate || function (fn) {
+    setTimeout(fn, 0);
+  };
+
+  var inherits = require("./inherits")
     , url = require('url')
     , events = require("events")
-    , AnrRequest = require('./anr-request')
-    , AnrResponse = require('./anr-response')
+    , AnrRequest = require('./anr-request-browser')
+    , AnrResponse = require('./anr-response-browser')
     , anr
     , key
     ;
@@ -31,7 +35,7 @@
     this._responseWares = [];
   }
 
-  util.inherits(Anr, events.EventEmitter);
+  inherits(Anr, events.EventEmitter);
 
   Anr.prototype.extend = function (fn) {
     if ('function' !== typeof fn) {
