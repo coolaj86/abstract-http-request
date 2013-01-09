@@ -144,7 +144,7 @@
       return;
     }
 
-    if ('string' === typeof options.body || options.body instanceof Buffer) {
+    if (('string' === typeof options.body) || (options.body instanceof Buffer)) {
       me.end(options.body);
       return;
     }
