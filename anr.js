@@ -132,6 +132,10 @@
         urlObj.body = null;
       }
     }
+
+    if (/^https/.test(urlObj.href) || /^https/.test(urlObj.protocol)) {
+      options.secure = true;
+    }
     
     return urlObj;
   };
