@@ -99,9 +99,9 @@
     Object.keys(query).forEach(function (key) {
       urlObj.query[key] = options.query[key];
     });
-    options.query = null;
 
     Object.keys(urlObj).forEach(function (key) {
+      if ('query' === key) { return; }
       var val = options[key]
         ;
 
@@ -134,7 +134,7 @@
     }
 
     if (/^https/.test(urlObj.href) || /^https/.test(urlObj.protocol)) {
-      options.secure = true;
+      urlObj.secure = true;
     }
     
     return urlObj;
