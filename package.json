@@ -1,7 +1,7 @@
 {
   "name": "ahr",
   "version": "3.0.0-rc",
-  "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.com)"
+  "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.com)",
   "maintainers": [
   ],
   "dependencies": {
