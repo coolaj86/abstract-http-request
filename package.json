@@ -1,0 +1,17 @@
+{
+  "name": "ahr-browser",
+  "version": "3.0.0-rc",
+  "author": "AJ ONeal <coolaj86@gmail.com> (http://coolaj86.com)"
+  "maintainers": [
+  ],
+  "browserDependencies": {
+    "forEachAsync": "2.x",
+    "events.node": ">= 0.4",
+    "url": ">= 0.4"
+  },
+  "dependencies": {
+    "forEachAsync": "2.x"
+  },
+  "main": "anr",
+  "devDependencies": {}
+}
