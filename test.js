@@ -7,6 +7,11 @@
     , client
     ;
 
+  anr.get("http://yahoo.com/").when(function (err, ahr, data) {
+    console.log('yahoozled', data);
+  });
+  return;
+
   client = anr.create()
     .extend(anr.Http())
     .use('http://foobar3000.com', '/echo', anr.json())

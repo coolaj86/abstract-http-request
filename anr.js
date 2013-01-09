@@ -191,6 +191,9 @@
   anr.text = require('./http-text');
   anr.extend(anr.Http());
 
+  anr.use(anr.text());
+  anr.use(anr.json());
+
   function ahr(a, b, c, d, e) {
     return anr.http(a, b, c, d, e);
   }

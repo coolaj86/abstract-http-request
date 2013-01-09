@@ -66,8 +66,8 @@
           me._chunks.push(chunk);
         });
         me.on('end', function () {
-          me.body = Buffer.concat(me.chunks);
-          me.fulfill();
+          me.body = Buffer.concat(me._chunks);
+          me._fulfill();
         });
       }
     });
