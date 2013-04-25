@@ -1,6 +1,11 @@
-/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true eqeqeq:true immed:true latedef:true*/
 (function () {
   "use strict";
+
+  function log() {
+    if (false) {
+      console.log.apply(console, arguments);
+    }
+  }
 
   function text(anr) {
     anr.for('prequest', function (req, next) {
@@ -22,12 +27,12 @@
         }
       }
 
-      console.log('[TEXT] matched prequest');
+      log('[TEXT] matched prequest');
       next();
     });
 
     anr.for('response', function (res, next) {
-      console.log('[TEXT] attempt response -----------------------------------');
+      log('[TEXT] attempt response -----------------------------------');
       var data = ''
         ;
 
@@ -38,18 +43,18 @@
       res.__text = true;
 
       if (!/text/.test(res.headers['content-type'])) {
-        console.log('[TEXT] skip: no text in content-type');
+        log('[TEXT] skip: no text in content-type');
         next();
         return;
       }
 
       res.on('data', function (chunk) {
-        console.log('[TEXT] onData', chunk);
+        log('[TEXT] onData', chunk);
         data += chunk;
       });
 
       res.on('end', function () {
-        console.log('[TEXT] onEnd');
+        log('[TEXT] onEnd');
         res.body = data;
         next();
       });

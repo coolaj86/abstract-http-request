@@ -1,12 +1,18 @@
-/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true eqeqeq:true immed:true latedef:true*/
 (function () {
   "use strict";
+
+  function log() {
+    if (false) {
+      console.log.apply(console, arguments);
+    }
+  }
 
   var util = require('util')
     , events = require('events')
     , forEachAsync = require('forEachAsync')
     , http = require('http')
     , https = require('https')
+    , querystring = require('querystring')
     , p
     ;
 
@@ -53,10 +59,10 @@
 
     // TODO get some callback for other todo
     forEachAsync(me.prequestWares, me._handleHandler, me).then(function () {
-      console.log('[AREQ] handled prequest headers');
+      log('[AREQ] handled prequest headers');
       process.nextTick(function () {
         me._sendHeaders();
-        console.log('[AREQ] sent headers');
+        log('[AREQ] sent headers');
         // default to built-in write method
         forEachAsync(me.wares, me._handleHandler, me).then(me._defaultWrite);
       });
@@ -111,9 +117,13 @@
      * auth
      * agent
      */
+    options.path = options.pathname;
+    if (options.query) {
+      options.path += '?' + querystring.stringify(options.query);
+    }
     me._nodeRequest = httpClient.request(options);
     me._nodeRequest.on('response', function (res) {
-      console.log('[AREQ] loading response wares');
+      log('[AREQ] loading response wares');
       me.context._response._start(res);
     });
     me._nodeRequest.on('error', function (err) {
@@ -124,11 +134,11 @@
     });
 
     me._requestSent = true;
-    console.log('[AREQ] Sent Request Headers');
+    log('[AREQ] Sent Request Headers');
     // TODO make stream writable at this point, but not before
   };
   p._defaultWrite = function () {
-    console.log('[AREQ] default Write');
+    log('[AREQ] default Write');
     // TODO progress for loaded
     var me = this
       , options = this.context._options
@@ -140,7 +150,7 @@
     }
 
     if (undefined === options.body) {
-      console.log('[AREQ] body not handled, waiting for req.end()');
+      log('[AREQ] body not handled, waiting for req.end()');
       return;
     }
 

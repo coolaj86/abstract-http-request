@@ -1,6 +1,11 @@
-/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true eqeqeq:true immed:true latedef:true unused:true undef:true*/
 (function () {
   "use strict";
+
+  function log() {
+    if (false) {
+      console.log.apply(console, arguments);
+    }
+  }
 
   var util = require('util')
     , events = require('events')
@@ -57,7 +62,7 @@
     me.headers = res.headers;
 
     forEachAsync(me.wares, me._handleHandler, me).then(function () {
-      console.log('[ARES] not handled by any of the wares, giving way to `response` handler.');
+      log('[ARES] not handled by any of the wares, giving way to `response` handler.');
       me.context._request.emit('response', me.context._response);
       if (me.completed) {
         me._fulfill();
@@ -79,7 +84,7 @@
     return this._nodeResponse.resume();
   };
   p._handleHandler = function (next, fn) {
-    console.log('[ARES] handling a response handler...');
+    log('[ARES] handling a response handler...');
     fn(this, next);
   };
 

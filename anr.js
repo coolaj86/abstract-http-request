@@ -1,6 +1,11 @@
-/*jshint strict:true node:true es5:true onevar:true laxcomma:true laxbreak:true eqeqeq:true immed:true latedef:true unused:true undef:true*/
 (function () {
   "use strict";
+
+  function log() {
+    if (false) {
+      console.log.apply(console, arguments);
+    }
+  }
 
   var util = require("util")
     , url = require('url')
@@ -140,20 +145,21 @@
     return urlObj;
   };
   Anr.prototype.http = function (urlStr, options) {
-    console.log('[CORE] http');
+    log('[CORE] http');
     var context = {}
       , request
       , response
       ;
 
     context._options = this._parse(urlStr, options);
+    log('[OPTS] http', context._options);
     request = new AnrRequest(this._prequestWares, this._requestWares, context);
     response = new AnrResponse(this._responseWares, context);
 
     context._request = request;
     context._response = response;
     
-    console.log('[CORE] wares');
+    log('[CORE] wares');
     this._wares.forEach(function (ware) {
       var fn = ware[2]
         , mount = ware[1]
@@ -165,17 +171,17 @@
         urlObj = url.parse(host);
         host = urlObj.host || host;
         if (!(context._options.host||"").match(host)) {
-          console.log('[WARE] host skip', host, context._options.host);
+          log('[WARE] host skip', host, context._options.host);
           return;
         }
       }
 
       if (mount && !(context._options.pathname||"").match(mount)) {
-        console.log('[WARE] mount skip', mount, context._options.pathname);
+        log('[WARE] mount skip', mount, context._options.pathname);
         return;
       }
 
-      console.log('[WARE] matched for ', host, mount, JSON.stringify(fn.toString().substr(0, 30)));
+      log('[WARE] matched for ', host, mount, JSON.stringify(fn.toString().substr(0, 30)));
       fn(this);
     }, this);
 
