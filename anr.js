@@ -97,8 +97,8 @@
     urlObj = url.parse(urlStr, true, true);
     urlObj.search = null;
 
-    if (options.user || options.username || options.pass || options.password) {
-      urlObj.auth = urlObj.auth || (options.user || options.username || '') + ':' + (options.pass || options.password || '');
+    if (options.auth || options.user || options.username || options.pass || options.password) {
+      urlObj.auth = urlObj.auth || options.auth || (options.user || options.username || '') + ':' + (options.pass || options.password || '');
     }
 
     Object.keys(query).forEach(function (key) {
